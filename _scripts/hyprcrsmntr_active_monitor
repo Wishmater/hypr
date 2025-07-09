@@ -1,0 +1,8 @@
+#!/run/current-system/sw/bin/bash
+
+monitor_count=3
+
+active_workspace=$(hyprctl activeworkspace -j | jq .id)
+active_monitor=$(((active_workspace - 1) % monitor_count + 1))
+
+echo $active_monitor

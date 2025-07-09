@@ -1,0 +1,17 @@
+#!/run/current-system/sw/bin/bash
+
+if [[ $# -eq 0 ]]; then
+  echo 'Argument required: in-monitor workspace'
+  exit 1
+fi
+
+if [[ $# -gt 1 ]]; then
+  echo 'Too many arguments. Expected 1 argument: in-monitor workspace'
+  exit 1
+fi
+
+target_in_monitor_workspace=$1
+active_monitor=$(hyprcrsmntr_active_monitor)
+
+hyprctl dispatch movetoworkspace "r~$target_in_monitor_workspace"
+hyprcrsmntr_workspace "$target_in_monitor_workspace" "$active_monitor"

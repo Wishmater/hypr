@@ -1,0 +1,30 @@
+#!/run/current-system/sw/bin/bash
+
+if [[ $# -eq 0 ]]; then
+  echo 'Argument required: in-monitor workspace. Plus optional: focused monitor'
+  exit 1
+fi
+
+if [[ $# -gt 2 ]]; then
+  echo 'Too many arguments. Expected 1 argument: in-monitor workspace. Plus optional: focused monitor'
+  exit 1
+fi
+
+monitor_count=3
+
+target_in_monitor_workspace=$1
+
+if [[ $# -gt 1 ]]; then
+  active_monitor=$2
+else
+  active_monitor=$(hyprcrsmntr_active_monitor)
+fi
+
+offset=$(((target_in_monitor_workspace - 1) * monitor_count))
+
+for ((i = monitor_count; i >= 1; i--)); do
+  if [[ $i -ne $active_monitor ]]; then
+    hyprctl dispatch workspace $((offset + i))
+  fi
+done
+hyprctl dispatch workspace $((offset + active_monitor))
