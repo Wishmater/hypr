@@ -1,17 +1,82 @@
 #!/run/current-system/sw/bin/bash
 
-if [[ $# -eq 0 ]]; then
-  echo 'Argument required: in-monitor workspace'
+# function to print usage and exit
+usage() {
+  echo "Usage: $(basename "$0") [-s|--silent] <workspace> [window_selector]"
+  echo "  workspace: Integer target in-monitor workspace number"
+  echo "  window_selector: Optional selector for window to move (defaults to active window)"
+  echo "  -s|--silent: Dont move to the "
   exit 1
+}
+
+# argumants declaration
+silent=false
+target_in_monitor_workspace=0
+target_window=""
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  -s | --silent)
+    silent=true
+    shift
+    ;;
+  -*)
+    echo "Error: Unknown option $1"
+    usage
+    ;;
+  *)
+    if [[ "$target_in_monitor_workspace" -eq 0 ]]; then
+      target_in_monitor_workspace="$1"
+    elif [[ -z "$target_window" ]]; then
+      target_window="$1"
+    else
+      echo "Error: Too many arguments"
+      usage
+    fi
+    shift
+    ;;
+  esac
+done
+
+# Validate input
+if [[ -z "$target_in_monitor_workspace" ]]; then
+  echo "Error: target in-monitor workspace number required"
+  usage
+fi
+if ! [[ "$target_in_monitor_workspace" =~ ^[0-9]+$ ]]; then
+  echo "Error: target in-monitor workspace number must be an integer"
+  usage
 fi
 
-if [[ $# -gt 1 ]]; then
-  echo 'Too many arguments. Expected 1 argument: in-monitor workspace'
-  exit 1
+monitor_count=3 # TODO get this from env somehow
+
+# get active monitor if necessary later
+active_monitor=0
+if [[ "$silent" != true || -n "$target_window" ]]; then # not used in the simplest case (silent and no window selector)
+  if [[ -z "$target_window" ]]; then
+    active_monitor=$(hyprcrsmntr_active_monitor)
+  else
+    active_monitor=$(hyprcrsmntr_active_monitor -w "$target_window")
+  fi
 fi
 
-target_in_monitor_workspace=$1
-active_monitor=$(hyprcrsmntr_active_monitor)
+# prepare target string to pass to hyprctl later
+target=""
+if [[ -z "$target_window" ]]; then
+  target="r~$target_in_monitor_workspace"
+else
+  # if the window being moved is not the one focused, we can't trust "r~" because works on the focused monitor, which might not be the one our window is in
+  workspace=$((((target_in_monitor_workspace - 1) * monitor_count) + active_monitor))
+  echo $workspace
+  target="$workspace,$target_window"
+fi
 
-hyprctl dispatch movetoworkspace "r~$target_in_monitor_workspace"
-hyprcrsmntr_workspace "$target_in_monitor_workspace" "$active_monitor"
+# execute move
+if [[ "$silent" == true ]]; then
+  hyprctl dispatch movetoworkspacesilent "$target"
+else
+  # move window and switch all monitors workspaces
+  hyprctl dispatch movetoworkspace "$target"
+  hyprcrsmntr_workspace "$target_in_monitor_workspace" "$active_monitor"
+fi

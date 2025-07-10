@@ -1,27 +1,68 @@
 #!/run/current-system/sw/bin/bash
 
-if [[ $# -eq 0 ]]; then
-  echo 'Argument required: in-monitor workspace. Plus optional: focused monitor'
+# function to print usage and exit
+usage() {
+  echo "Usage: $(basename "$0") [-s|--silent] <workspace> [active_monitor]"
+  echo "  workspace: Integer target in-monitor workspace number"
+  echo "  active_monitor: Optional id of the monitor to focus after switching (defaults to active monitor)"
   exit 1
+}
+
+target_in_monitor_workspace=0
+active_monitor=0
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  -*)
+    echo "Error: Unknown option $1"
+    usage
+    ;;
+  *)
+    if [[ "$target_in_monitor_workspace" -eq 0 ]]; then
+      target_in_monitor_workspace="$1"
+    elif [[ "$active_monitor" -eq 0 ]]; then
+      active_monitor="$1"
+    else
+      echo "Error: Too many arguments"
+      usage
+    fi
+    shift
+    ;;
+  esac
+done
+
+# Validate input
+if [[ -z "$target_in_monitor_workspace" ]]; then
+  echo "Error: target in-monitor workspace number required"
+  usage
 fi
-
-if [[ $# -gt 2 ]]; then
-  echo 'Too many arguments. Expected 1 argument: in-monitor workspace. Plus optional: focused monitor'
-  exit 1
+if ! [[ "$target_in_monitor_workspace" =~ ^[0-9]+$ ]]; then
+  echo "Error: target in-monitor workspace number must be an integer"
+  usage
 fi
-
-monitor_count=3
-
-target_in_monitor_workspace=$1
-
-if [[ $# -gt 1 ]]; then
-  active_monitor=$2
-else
+if [[ "$active_monitor" -eq 0 ]]; then
   active_monitor=$(hyprcrsmntr_active_monitor)
 fi
+if ! [[ "$active_monitor" =~ ^[0-9]+$ ]]; then
+  echo "Error: active monitor id must be an integer"
+  usage
+fi
 
+# get other required data
+monitor_count=3 # TODO get this from env somehow
+
+# move pinned windows to new workspace (silently)
+pinned_clients=$(hyprctl clients -j | jq -r '.[] | select(.tags[]? == "crsmntr_pinned") | .address')
+for client in $pinned_clients; do
+  echo "hyprcrsmntr_movetoworkspace $target_in_monitor_workspace address:$client --silent"
+  hyprcrsmntr_movetoworkspace "$target_in_monitor_workspace" address:"$client" --silent
+done
+# can't use the following script to move all at once, because then they all end up in the active monitor
+# hyprcrsmntr_movetoworkspace "$target_in_monitor_workspace" tag:crsmntr_pinned --silent
+
+# switch to desired workspace. Switch last on the active_monitor so it retains focus
 offset=$(((target_in_monitor_workspace - 1) * monitor_count))
-
 for ((i = monitor_count; i >= 1; i--)); do
   if [[ $i -ne $active_monitor ]]; then
     hyprctl dispatch workspace $((offset + i))

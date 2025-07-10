@@ -1,8 +1,74 @@
 #!/run/current-system/sw/bin/bash
 
-monitor_count=3
+# Function to print usage
+usage() {
+  echo "Usage: $(basename "$0") [--window|-w <window_selector>] [--workspace|-s <workspace_id>]"
+  echo "  No args: Returns focused monitor"
+  echo "  -w, --window <window_selector>: Returns monitor for window_selector"
+  echo "  -s, --workspace <workspace_id>: Returns monitor for workspace_id"
+  exit 1
+}
 
-active_workspace=$(hyprctl activeworkspace -j | jq .id)
+# Initialize variables
+window_selector=""
+workspace_id=0
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  -w | --window)
+    if [[ -z "$2" ]]; then
+      echo "Error: Window selector required after $1"
+      usage
+    fi
+    window_selector="$2"
+    shift 2
+    ;;
+  -s | --workspace)
+    if [[ -z "$2" ]]; then
+      echo "Error: Workspace ID required after $1"
+      usage
+    fi
+    workspace_id="$2"
+    shift 2
+    ;;
+  -*)
+    echo "Error: Unknown option $1"
+    usage
+    ;;
+  *)
+    echo "Error: Unexpected argument $1"
+    usage
+    ;;
+  esac
+done
+
+# Validate mutually exclusive options
+if [[ -n "$window_selector" && ! $workspace_id -eq 0 ]]; then
+  echo "Error: --window and --workspace cannot be used together"
+  usage
+fi
+
+# get other required data
+monitor_count=3 # TODO get this from env somehow
+
+active_workspace=0
+if [[ -n "$window_selector" ]]; then
+  # Parse selector
+  field="${window_selector%%:*}"
+  value="${window_selector#*:}"
+  # Validate selector format
+  if [[ -z "$field" || -z "$value" || ! "$window_selector" =~ ^[^:]+:[^:]+$ ]]; then
+    echo "Error: Invalid selector format, use field:value"
+    usage
+  fi
+  active_workspace=$(hyprctl clients -j | jq -r ".[] | select(.$field == \"$value\") | .workspace.id")
+elif [[ ! "$workspace_id" -eq 0 ]]; then
+  active_workspace=$workspace_id
+else
+  active_workspace=$(hyprctl activeworkspace -j | jq .id)
+fi
+# TODO what happens if current workspace is special:magic (-98?)
 active_monitor=$(((active_workspace - 1) % monitor_count + 1))
 
 echo $active_monitor
