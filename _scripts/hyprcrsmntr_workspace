@@ -55,7 +55,6 @@ monitor_count=3 # TODO get this from env somehow
 # move pinned windows to new workspace (silently)
 pinned_clients=$(hyprctl clients -j | jq -r '.[] | select(.tags[]? == "crsmntr_pinned") | .address')
 for client in $pinned_clients; do
-  echo "hyprcrsmntr_movetoworkspace $target_in_monitor_workspace address:$client --silent"
   hyprcrsmntr_movetoworkspace "$target_in_monitor_workspace" address:"$client" --silent
 done
 # can't use the following script to move all at once, because then they all end up in the active monitor
