@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+# Default value for internal state
+SET_INTERNAL=false
+
+# Parse command line arguments
+while [ $# -gt 0 ]; do
+  case "$1" in
+  --internal)
+    SET_INTERNAL=true
+    shift
+    ;;
+  *)
+    echo "Error: Invalid argument. Usage: $0 [--internal]"
+    exit 1
+    ;;
+  esac
+done
+
+# Get active window info
+active_window=$(hyprctl activewindow -j)
+
+# Check if hyprctl command was successful
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to get active window information"
+  exit 1
+fi
+
+# Check if window is fullscreen or maximized
+is_fullscreen=$(echo "$active_window" | jq '.fullscreen')
+is_maximized=$(echo "$active_window" | jq '.maximized')
+
+# Check if jq commands were successful
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to parse window information"
+  exit 1
+fi
+
+if [ "$is_fullscreen" = "true" ] || [ "$is_maximized" = "true" ]; then
+
+  # Set to normal state
+  hyprctl dispatch fullscreenstate 0 0
+
+else
+
+  # Check if window is on special workspace
+  is_special=$(echo "$active_window" | jq '.workspace.name | startswith("special")')
+
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to check workspace information"
+    exit 1
+  fi
+
+  if [ "$is_special" = "true" ]; then
+    # Maximize if on special workspace
+    if [ "$SET_INTERNAL" = "true" ]; then
+      hyprctl dispatch fullscreenstate 1 1
+    else
+      hyprctl dispatch fullscreenstate 1 0
+    fi
+  else
+    # Fullscreen if not on special workspace
+    if [ "$SET_INTERNAL" = "true" ]; then
+      hyprctl dispatch fullscreenstate 2 2
+    else
+      hyprctl dispatch fullscreenstate 2 0
+    fi
+  fi
+
+fi
