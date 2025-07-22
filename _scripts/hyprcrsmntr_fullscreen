@@ -57,7 +57,7 @@ else
   if [ "$is_special" = "true" ]; then
     # Maximize if on special workspace
     if [ "$SET_INTERNAL" = "true" ]; then
-      hyprctl dispatch fullscreenstate 1 1
+      hyprctl dispatch fullscreenstate 1 2
     else
       hyprctl dispatch fullscreenstate 1 0
     fi
