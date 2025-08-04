@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+# Check if exactly 2 arguments are provided
+if [ $# -ne 2 ]; then
+  echo "Error: Exactly 2 arguments (x, y) required"
+  echo "Usage: $0 <x> <y>"
+  exit 1
+fi
+
+x=$1
+y=$2
+
+# Validate that inputs are integers
+if ! [[ "$x" =~ ^[0-9]+$ ]] || ! [[ "$y" =~ ^[0-9]+$ ]]; then
+  echo "Error: Coordinates must be positive integers"
+  exit 1
+fi
+
+# Get all monitors and active monitor info using hyprctl
+monitors=$(hyprctl -j monitors)
+active_monitor=$(echo "$monitors" | jq -r '.[] | select(.focused == true)')
+
+# Check if active monitor was found
+if [ -z "$active_monitor" ]; then
+  echo "Error: No active monitor found"
+  exit 1
+fi
+
+# Find the leftmost and topmost monitor's x and y positions
+min_x=$(echo "$monitors" | jq -r 'min_by(.x) | .x')
+min_y=$(echo "$monitors" | jq -r 'min_by(.y) | .y')
+# min_x=0
+# min_y=0
+
+# Extract active monitor position
+mon_x=$(echo "$active_monitor" | jq -r '.x')
+mon_y=$(echo "$active_monitor" | jq -r '.y')
+
+# Adjust coordinates to absolute position (ydotool uses topmost-leftmost monitor as 0,0)
+abs_x=$((x + mon_x - min_x))
+abs_y=$((y + mon_y - min_y))
+
+# Ensure coordinates are non-negative for ydotool
+if [ $abs_x -lt 0 ] || [ $abs_y -lt 0 ]; then
+  echo "Error: Adjusted coordinates ($abs_x, $abs_y) cannot be negative"
+  exit 1
+fi
+
+# Perform click using ydotool
+ydotool mousemove --absolute $abs_x $abs_y
+ydotool click 0xC0
+
+exit 0
