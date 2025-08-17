@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# Check if wf-recorder is running, kill it and exit if true
+if pgrep wf-recorder >/dev/null; then
+  pkill wf-recorder
+  echo "Recording finished"
+  exit 0
+fi
+
+# Check for valid option (output or region)
+if [ "$1" != "output" ] && [ "$1" != "region" ]; then
+  echo "Usage: $0 {output|region} [geometry]"
+  exit 1
+fi
+
+# Get output directory and set filename with current datetime
+OUTPUT_DIR=$(xdg-user-dir VIDEOS)
+FILENAME="$OUTPUT_DIR/recording_$(date +%Y%m%d_%H%M%S).mp4"
+
+# Start recording based on option
+if [ "$1" = "region" ]; then
+  if [ -n "$2" ]; then
+    REGION=$2
+  else
+    REGION=$(slurp)
+  fi
+else
+  REGION=$(slurp -o)
+fi
+wf-recorder -g "$REGION" -f "$FILENAME" --audio
