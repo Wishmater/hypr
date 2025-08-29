@@ -28,5 +28,6 @@ else
   REGION=$(slurp -o)
 fi
 if [[ $REGION != "" ]]; then
-  wf-recorder -g "$REGION" -f "$FILENAME" --audio
+  wf-recorder -g "$REGION" -f "$FILENAME"
+  # wf-recorder -g "$REGION" -f "$FILENAME" --audio
 fi
