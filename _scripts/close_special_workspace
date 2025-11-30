@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# https://grok.com/c/b465bc38-057c-4625-80a2-e1696accc3c2
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+  echo "Usage: $0 [MAX_COUNT]"
+  echo "  MAX_COUNT: Optional max window count (int); closes if <= this or always if omitted."
+  exit 0
+fi
+
+if [[ $# -gt 1 ]] || [[ $# -eq 1 && ! $1 =~ ^[0-9]+$ ]]; then
+  echo "Usage: $0 [MAX_COUNT]"
+  echo "  MAX_COUNT: Optional max window count (int); closes if <= this or always if omitted."
+  exit 1
+fi
+
+monitors=$(hyprctl monitors -j)
+ws=$(echo "$monitors" | jq -r '.[] | select(.focused) | .specialWorkspace.name // empty')
+
+if [[ $ws != special:* ]]; then
+  echo "not closed because not currently in a special workspace"
+  exit 0
+fi
+
+max_count=-1 # Default: always close
+if [[ $# -eq 1 ]]; then
+  max_count=$1
+fi
+echo "WTF: $max_count"
+
+ws_name="${ws#special:}"
+
+if [[ $max_count -eq -1 ]]; then
+  hyprctl dispatch togglespecialworkspace "$ws_name"
+  echo "closed $ws, no max window count defined"
+else
+  windows=$(hyprctl clients -j | jq --arg ws "$ws" '[.[] | select(.workspace.name == $ws)] | length')
+  if [[ $windows -le $max_count ]]; then
+    hyprctl dispatch togglespecialworkspace "$ws_name"
+    echo "closed $ws, because it had $windows windows (max ${max_count})"
+  else
+    echo "not closed $ws, because it has $windows windows (max ${max_count})"
+  fi
+fi
