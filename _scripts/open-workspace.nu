@@ -63,15 +63,30 @@ def open-ghostty [
     log debug $"    Ghostty cmd: ($ghostty_cmd)"
 
     if not $dry_run {
-        job spawn { bash -c $ghostty_cmd }
-        sleep 300ms
-
-        send-text-to-window $pane_name "nix develop" true
-
-        if ($after_cmd != null) {
-            send-text-to-window $pane_name $after_cmd $adter_cmd_enter
+        job spawn {
+            bash -c $ghostty_cmd
+        }
+        job spawn {
+            wait-for-window $pane_name
+            send-text-to-window $pane_name "nix develop" true
+            if ($after_cmd != null) {
+                send-text-to-window $pane_name $after_cmd $adter_cmd_enter
+            }
         }
     }
+}
+
+# Poll hyprctl until a window with the given title appears
+def wait-for-window [title: string] {
+    for $i in 0..30 {
+        let clients = (^hyprctl clients -j | from json)
+        if ($clients | where title == $title | length) > 0 {
+            sleep 200ms
+            return
+        }
+        sleep 100ms
+    }
+    log warning $"Window with title '($title)' did not appear"
 }
 
 # Send text keystrokes to a window identified by its title, via hyprctl dispatch
