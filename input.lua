@@ -1,0 +1,29 @@
+-- https://wiki.hyprland.org/Configuring/Variables/#input
+
+hl.config({
+    input = {
+        -- Keyboard
+        kb_layout           = "us,es",
+        kb_options          = "grp:win_space_toggle,caps:swapescape",
+        numlock_by_default  = true,
+
+        -- Mouse
+        follow_mouse  = 1, -- auto-focus window under mouse
+        force_no_accel = true,
+
+        -- special_fallthrough = true -- SET FOR TRANSPARENT SPECIAL WORKSPACE
+    },
+
+    -- https://wiki.hyprland.org/Configuring/Variables/#cursor
+    cursor = {
+        -- CHANGE: default_monitor now takes the monitor name directly rather than a $var reference
+        default_monitor   = vars.monitor1,
+        inactive_timeout  = 1,
+        hide_on_key_press = true,
+        hide_on_touch     = true,
+    },
+
+    misc = {
+        middle_click_paste = false,
+    },
+})

@@ -1,0 +1,131 @@
+-- layout settings
+
+hl.config({
+    general = {
+        layout = "master",
+        -- layout = "dwindle",
+
+        no_focus_fallback = true, -- avoid inconsistent focus jumps when no clear target is in the direction
+
+        -- # cool, but not that useful since I rarely use floating windows
+        -- snap = {
+        --     enabled       = true,
+        --     window_gap    = 8,
+        --     monitor_gap   = 8,
+        --     respect_gaps  = true,
+        -- },
+    },
+})
+
+-- https://wiki.hypr.land/Configuring/Master-Layout/
+hl.config({
+    master = {
+        -- # orientation is set with workspace rules on a per-monitor basis
+        -- orientation = "top", -- placement of master window
+
+        -- mfact = 0.71875 -- size of the master window, trying to get a 1x2 slave panel (1920-540)/1920
+        mfact = 0.68359375, -- size of the master window, trying to get a 9x16 slave panel
+
+        -- this could be good if we could set it to only some workspaces, but it hard breaks secondary monitors
+        always_keep_position = true, -- master doesn't take whole screen when it's alone
+
+        new_status    = "inherit", -- slave
+        new_on_active = "before",
+        new_on_top    = true,
+
+        slave_count_for_center_master = 0,
+        -- # this is overall pretty buggy, better to implement with workspace rules
+        -- # it has a breaking bug where window dragging will be borked, try on new release
+        -- orientation = "center",
+        -- center_master_fallback = "right",
+        -- slave_count_for_center_master = 6,
+    },
+})
+
+-- See https://wiki.hyprland.org/Configuring/Layouts/Dwindle-Layout/ for more
+hl.config({
+    dwindle = {
+        preserve_split  = true, -- You probably want this
+    },
+})
+
+hl.config({
+    scrolling = {
+        fullscreen_on_one_column = false,
+        column_width             = 0.68359375,
+        explicit_column_widths   = "0.333, 0.5, 0.68359375, 1.0",
+        focus_fit_method         = 0, -- center
+    },
+})
+
+-- https://wiki.hyprland.org/Configuring/Variables/#misc
+hl.config({
+    misc = {
+        close_special_on_empty = true,
+        -- TODO: 2 this is annoying specifically with telegram calls while gaming, maybe we can just fix telegram call popup window to open somewhere else, or set this option to ignore new window (0) while gaming
+        on_focus_under_fullscreen = 2, -- unmaximize
+
+        -- this is really good with neovide
+        enable_swallow = true,
+        swallow_regex  = "^(Alacritty|com\\.mitchellh\\.ghostty)$",
+    },
+})
+
+hl.config({
+    binds = {
+        hide_special_on_workspace_change = true,
+        -- infer by length, instead of history, to avoid unpredictability
+        focus_preferred_method          = 1,
+        -- focus on last active window when switching to workspace; this is better because it ensures
+        -- the mouse is inside the focus window, otherwise there are weird cases where the last focused
+        -- window will be re-focused, and the cursor will be outside of it
+        workspace_center_on             = 1,
+        movefocus_cycles_groupfirst     = true,
+    },
+})
+
+hl.config({
+    group = {
+        auto_group             = false,
+        insert_after_current   = false,
+        drag_into_group        = 2, -- only on groupbar
+        merge_groups_on_drag   = false,
+        merge_groups_on_groupbar = true,
+
+        -- TODO 3 maybe change colors for groups ??
+        col = {
+            border_active           = { colors = { "rgb(33ccff)", "rgb(529E93)", "rgb(98BB6C)" }, angle = 90 }, -- defaultHyprCyan interpWithLowerLuminance springGreen
+            border_inactive         = "rgba(625e5aaa)", -- dragonBlack6
+            border_locked_active    = { colors = { "rgb(33ccff)", "rgb(529E93)", "rgb(98BB6C)" }, angle = 90 }, -- defaultHyprCyan interpWithLowerLuminance springGreen
+            border_locked_inactive  = "rgba(625e5aaa)", -- dragonBlack6
+        },
+
+        groupbar = {
+            font_family         = "JetBrainsMono Nerd Font",
+            font_size           = 15,
+            font_weight_active  = "ultraheavy", -- numeric values dont work for some fuckin reason :))
+            font_weight_inactive = "normal",
+            height              = 24,
+            gradients           = true, -- indicator is set as background of the full height of groupbar
+            gradient_rounding   = 12,
+            gradient_round_only_edges = false,
+            gaps_in             = 4,
+            gaps_out            = 2,
+            indicator_height    = 0,
+            rounding            = 0,
+            scrolling           = false,
+
+            text_color          = "rgb(c5c9c5)", -- dragonWhite
+            -- # this would be cool, but seems to not be available in my version... try again after update
+            -- text_color_inactive = "rgb(ffffff)",
+            -- text_color_locked_active
+            -- text_color_locked_inactive
+            col = {
+                active   = "rgba(2D4F67dd)",
+                inactive = "rgba(0d0c0cbb)", -- dragonBlack0
+                -- locked_active
+                -- locked_inactive
+            },
+        },
+    },
+})
