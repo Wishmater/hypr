@@ -31,17 +31,17 @@ hl.workspace_rule({ workspace = "special:4", gaps_in = 12, gaps_out = 36 })
 -- Monitor 1
 -- Master
 hl.workspace_rule({ workspace = "m[" .. vars.monitor1 .. "]w[tv1]",       
-  -- layoutopt = { orientation = "center" } 
+  layout_opts = { orientation = "center" } 
 })
 hl.workspace_rule({ workspace = "m[" .. vars.monitor1 .. "]w[tv2-6]",     
-  -- layoutopt = { orientation = "right" } 
+  layout_opts = { orientation = "right" } 
 })
 hl.workspace_rule({ workspace = "m[" .. vars.monitor1 .. "]w[tv7-999999]", 
-  -- layoutopt = { orientation = "center" } 
+  layout_opts = { orientation = "center" } 
 })
 -- Scrolling
 hl.workspace_rule({ workspace = "m[" .. vars.monitor1 .. "]",             
-  -- layoutopt = { direction = "right" } 
+  layout_opts = { direction = "right" } 
 })
 
 -- Monitor 2
@@ -50,28 +50,28 @@ hl.workspace_rule({ workspace = "m[" .. vars.monitor1 .. "]",
 -- this could be a workaround IF IT WORKED
 -- workspace = m[$monitor2], layoutopt:always_keep_position:false
 hl.workspace_rule({ workspace = "m[" .. vars.monitor2 .. "]w[tv1]",       
-  -- layoutopt = { orientation = "right" } 
+  layout_opts = { orientation = "right" } 
 }) -- center
 hl.workspace_rule({ workspace = "m[" .. vars.monitor2 .. "]w[tv2-4]",     
-  -- layoutopt = { orientation = "bottom" } 
+  layout_opts = { orientation = "bottom" } 
 })
 hl.workspace_rule({ workspace = "m[" .. vars.monitor2 .. "]w[tv5-999999]", 
-  -- layoutopt = { orientation = "bottom" } 
+  layout_opts = { orientation = "bottom" } 
 }) -- center
 -- Scrolling
 hl.workspace_rule({ workspace = "m[" .. vars.monitor2 .. "]",             
-  -- layoutopt = { direction = "down" } 
+  layout_opts = { direction = "down" } 
 })
 
 -- Monitor 3
 -- Master
 hl.workspace_rule({ workspace = "m[" .. vars.monitor3 .. "]w[tv1-6]",     
-  -- layoutopt = { orientation = "left" } 
+  layout_opts = { orientation = "left" } 
 })
 hl.workspace_rule({ workspace = "m[" .. vars.monitor3 .. "]w[tv7-999999]", 
-  -- layoutopt = { orientation = "center" } 
+  layout_opts = { orientation = "center" } 
 })
 -- Scrolling
 hl.workspace_rule({ workspace = "m[" .. vars.monitor3 .. "]",             
-  -- layoutopt = { direction = "left" } 
+  layout_opts = { direction = "left" } 
 })
