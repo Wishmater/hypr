@@ -64,7 +64,7 @@ done
 offset=$(((target_in_monitor_workspace - 1) * monitor_count))
 for ((i = monitor_count; i >= 1; i--)); do
   if [[ $i -ne $active_monitor ]]; then
-    hyprctl dispatch workspace $((offset + i))
+    hyprctl dispatch "hl.dsp.focus({ workspace = $((offset + i)) })"
   fi
 done
-hyprctl dispatch workspace $((offset + active_monitor))
+hyprctl dispatch "hl.dsp.focus({ workspace = $((offset + active_monitor)) })"

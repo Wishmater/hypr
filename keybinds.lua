@@ -149,11 +149,10 @@ hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd("hyprcrsmntr_movetoworkspace 
 hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprcrsmntr_movetoworkspace 3"))
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("hyprcrsmntr_movetoworkspace 4"))
 -- Silent window moving (don't switch workspace)
--- CHANGE: movetoworkspacesilent uses hl.dsp.window.move({ workspace = ... }) — the "silent" aspect may need a flag
-hl.bind(mainMod .. " + SHIFT + CTRL + Z", hl.dsp.window.move({ workspace = "r~1" }))
-hl.bind(mainMod .. " + SHIFT + CTRL + X", hl.dsp.window.move({ workspace = "r~2" }))
-hl.bind(mainMod .. " + SHIFT + CTRL + C", hl.dsp.window.move({ workspace = "r~3" }))
-hl.bind(mainMod .. " + SHIFT + CTRL + V", hl.dsp.window.move({ workspace = "r~4" }))
+hl.bind(mainMod .. " + SHIFT + CTRL + Z", hl.dsp.window.move({ workspace = "r~1", follow = false }))
+hl.bind(mainMod .. " + SHIFT + CTRL + X", hl.dsp.window.move({ workspace = "r~2", follow = false }))
+hl.bind(mainMod .. " + SHIFT + CTRL + C", hl.dsp.window.move({ workspace = "r~3", follow = false }))
+hl.bind(mainMod .. " + SHIFT + CTRL + V", hl.dsp.window.move({ workspace = "r~4", follow = false }))
 
 -- SPECIAL WORKSPACES
 -- Switch workspaces
@@ -167,10 +166,10 @@ hl.bind(mainMod .. " + SHIFT + 2", hl.dsp.window.move({ workspace = "special:2" 
 hl.bind(mainMod .. " + SHIFT + 3", hl.dsp.window.move({ workspace = "special:3" }))
 hl.bind(mainMod .. " + SHIFT + 4", hl.dsp.window.move({ workspace = "special:4" }))
 -- Move silent
-hl.bind(mainMod .. " + SHIFT + CTRL + 1", hl.dsp.window.move({ workspace = "special:1" }))
-hl.bind(mainMod .. " + SHIFT + CTRL + 2", hl.dsp.window.move({ workspace = "special:2" }))
-hl.bind(mainMod .. " + SHIFT + CTRL + 3", hl.dsp.window.move({ workspace = "special:3" }))
-hl.bind(mainMod .. " + SHIFT + CTRL + 4", hl.dsp.window.move({ workspace = "special:4" }))
+hl.bind(mainMod .. " + SHIFT + CTRL + 1", hl.dsp.window.move({ workspace = "special:1", follow = false  }))
+hl.bind(mainMod .. " + SHIFT + CTRL + 2", hl.dsp.window.move({ workspace = "special:2", follow = false  }))
+hl.bind(mainMod .. " + SHIFT + CTRL + 3", hl.dsp.window.move({ workspace = "special:3", follow = false  }))
+hl.bind(mainMod .. " + SHIFT + CTRL + 4", hl.dsp.window.move({ workspace = "special:4", follow = false  }))
 -- Close special workspace
 hl.bind("Escape",             hl.dsp.exec_cmd("close_special_workspace 0"),     { non_consuming = true })
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("close_special_workspace"),    { non_consuming = true })

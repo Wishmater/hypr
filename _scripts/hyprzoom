@@ -35,4 +35,4 @@ esac
 
 echo $new
 
-hyprctl keyword cursor:zoom_factor $new
+hyprctl eval "hl.config({ cursor = { zoom_factor = $new } })"

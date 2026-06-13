@@ -94,13 +94,13 @@ def send-text-to-window [title: string, text: string, add_enter?: bool = false] 
     let chars = $text | split chars
     for char in $chars {
         let key = if $char == " " { "space" } else { $char }
-        log debug $"    Hyprland cmd: hyprctl dispatch sendshortcut , ($key), title:($title)"
-        ^hyprctl dispatch sendshortcut $", ($key), title:($title)" out> (null-device)
+        log debug $"    Hyprland cmd: hyprctl dispatch hl.dsp.send_shortcut\({ key = \"($key)\", window = { title = \"($title)\" } })"
+        ^hyprctl dispatch $"hl.dsp.send_shortcut\({ key = \"($key)\", window = {{ title = \"($title)\" } })" out> (null-device)
         sleep 30ms
     }
 
     if ($add_enter) {
-        log debug $"    Hyprland cmd: hyprctl dispatch sendshortcut , Return, title:($title)"
-        ^hyprctl dispatch sendshortcut $", Return, title:($title)" out> (null-device)
+        log debug $"    Hyprland cmd: hyprctl dispatch hl.dsp.send_shortcut\({ key = \"Return\", window = {{ title = \"($title)\" } })"
+        ^hyprctl dispatch $"hl.dsp.send_shortcut\({ key = \"Return\", window = {{ title = \"($title)\" } })" out> (null-device)
     }
 }

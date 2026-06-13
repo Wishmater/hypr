@@ -38,8 +38,8 @@ def main [
 
   # call hyprctl to set desired new state
   if $fullscreen_state != $active_window.fullscreen or $fullscreen_state_client != $active_window.fullscreenClient {
-    print $"calling `hyprctl dispatch fullscreenstate ($fullscreen_state) ($fullscreen_state_client)`..."
-    hyprctl dispatch fullscreenstate $fullscreen_state $fullscreen_state_client
+    print $"calling `hyprctl dispatch hl.dsp.window.fullscreen_state\({ internal = ($fullscreen_state), client = ($fullscreen_state_client) })`..."
+    hyprctl dispatch $"hl.dsp.window.fullscreen_state\({ internal = ($fullscreen_state), client = ($fullscreen_state_client) })"
   } else {
     # if we call hyprctl with the same state it already has, it toggles it :))
     print "Desired state is already the current one, skipping hyprctl call."

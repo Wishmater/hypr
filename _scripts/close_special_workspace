@@ -31,12 +31,12 @@ echo "WTF: $max_count"
 ws_name="${ws#special:}"
 
 if [[ $max_count -eq -1 ]]; then
-  hyprctl dispatch togglespecialworkspace "$ws_name"
+  hyprctl dispatch "hl.dsp.workspace.toggle_special(\"$ws_name\")"
   echo "closed $ws, no max window count defined"
 else
   windows=$(hyprctl clients -j | jq --arg ws "$ws" '[.[] | select(.workspace.name == $ws)] | length')
   if [[ $windows -le $max_count ]]; then
-    hyprctl dispatch togglespecialworkspace "$ws_name"
+    hyprctl dispatch "hl.dsp.workspace.toggle_special(\"$ws_name\")"
     echo "closed $ws, because it had $windows windows (max ${max_count})"
   else
     echo "not closed $ws, because it has $windows windows (max ${max_count})"
