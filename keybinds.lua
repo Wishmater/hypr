@@ -1,7 +1,6 @@
--- https://wiki.hyprland.org/Configuring/Basics/Binds/ for more
+-- https://wiki.hyprland.org/Configuring/Basics/Binds/
 -- https://wiki.hyprland.org/Configuring/Keywords/
 
--- CHANGE: binds:scroll_event_delay moved to hl.config({ binds = { ... } })
 hl.config({
 	binds = {
 		scroll_event_delay = 0,
@@ -11,24 +10,21 @@ hl.config({
 -- WINDOW
 hl.bind("SUPER + S", hl.dsp.window.close(), { description = "Close active window" })
 hl.bind("SUPER + SHIFT + CTRL + S", hl.dsp.window.kill(), { description = "Kill active window" })
-hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("waywingctl dismiss_notifications"))
-hl.bind("SUPER + A", hl.dsp.exec_cmd("hyprctl dispatch tagwindow +crsmntr_pinned")) -- CHANGE: tagwindow with +/- needs hyprctl workaround
-hl.bind("SUPER + SHIFT + A", hl.dsp.window.float({ action = "on" })) -- setfloating
-hl.bind("SUPER + SHIFT + A", hl.dsp.exec_cmd("hyprctl dispatch pin activewindow")) -- pin (CHANGE: pin is not a dedicated dispatcher; using hyprctl)
+hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("waywingctl dismiss_notifications")) -- TODO: 2 implement dismiss notifications in waywing
+hl.bind("SUPER + A", hl.dsp.window.tag({ tag = "crsmntr_pinned" }))
+hl.bind("SUPER + SHIFT + A", hl.dsp.window.float({ action = "on" }))
+hl.bind("SUPER + SHIFT + A", hl.dsp.window.pin())
 hl.bind("SUPER + F", hl.dsp.exec_cmd("hyprcrsmntr_fullscreen.nu"))
 hl.bind("SUPER + SHIFT + F", hl.dsp.exec_cmd("hyprcrsmntr_fullscreen.nu --internal"))
-hl.bind("SUPER + SHIFT + CTRL + F", hl.dsp.exec_cmd("hyprctl dispatch tagwindow +reverse_client_fullscreen"))
+hl.bind("SUPER + SHIFT + CTRL + F", hl.dsp.window.tag({ tag = "reverse_client_fullscreen" }))
 hl.bind("SUPER + SHIFT + CTRL + F", hl.dsp.exec_cmd("hyprcrsmntr_fullscreen.nu update"))
-hl.bind("SUPER + G", hl.dsp.window.float({ action = "toggle" }), { description = "Toggle floating" })
+hl.bind("SUPER + G", hl.dsp.window.float(), { description = "Toggle floating" })
 
 -- TILING
-hl.bind("SUPER + code:49", hl.dsp.group.toggle(), { description = "Toggle group" }) -- tilde (`)
--- CHANGE: toggleswallow dispatcher was removed in 0.55; keeping as exec fallback
-hl.bind("SUPER + SHIFT + code:49", hl.dsp.window.toggle_swallow(), { description = "Toggle swallow" }) -- tilde (`)
+hl.bind("SUPER + code:49", hl.dsp.group.toggle(), { description = "Toggle group" }) -- code:49 = tilde (`)
+hl.bind("SUPER + SHIFT + code:49", hl.dsp.window.toggle_swallow(), { description = "Toggle swallow" }) -- code:49 = tilde (`)
 hl.bind("SUPER + SHIFT + Tab", hl.dsp.group.next(), { description = "Change group active" })
-hl.bind("SUPER + F1", hl.dsp.exec_cmd("uglymode_toggle"))
--- bind = SUPER SHIFT, F, pseudo, # dwindle
--- bind = SUPER SHIFT, A, togglesplit, # dwindle
+hl.bind("SUPER + F1", hl.dsp.exec_cmd("uglymode_toggle")) -- TODO: 1 fix uglymode
 
 -- MOVE FOCUS
 hl.bind("SUPER + left", hl.dsp.focus({ direction = "l" }))
@@ -39,14 +35,11 @@ hl.bind("SUPER + H", hl.dsp.focus({ direction = "l" }))
 hl.bind("SUPER + L", hl.dsp.focus({ direction = "r" }))
 hl.bind("SUPER + K", hl.dsp.focus({ direction = "u" }))
 hl.bind("SUPER + J", hl.dsp.focus({ direction = "d" }))
-hl.bind("ALT + code:49", hl.dsp.focus({ urgent_or_last = true }), { description = "Focus urgent or last" }) -- tilde (`)
+hl.bind("ALT + code:49", hl.dsp.focus({ urgent_or_last = true }), { description = "Focus urgent or last" }) -- code:49 = tilde (`)
 hl.bind("ALT + Tab", hl.dsp.window.cycle_next())
--- CHANGE: cyclenext with "prev" arg doesn't have a direct hl.dsp equivalent; using focus({ workspace = "previous" }) or the window variant
--- Using hl.dsp.focus({ last = true }) as closest alternative for moving backwards in cycle
-hl.bind("ALT + SHIFT + Tab", hl.dsp.window.cycle_next()) -- NOTE: for cycle prev, might need a different dispatch
+hl.bind("ALT + SHIFT + Tab", hl.dsp.window.cycle_next({ next = false })) -- NOTE: for cycle prev, might need a different dispatch
 
 -- MOVE WINDOWS
--- CHANGE: movewindow dispatcher → hl.dsp.window.move({ direction = "..." })
 hl.bind("SUPER + SHIFT + left", hl.dsp.window.move({ direction = "l" }))
 hl.bind("SUPER + SHIFT + right", hl.dsp.window.move({ direction = "r" }))
 hl.bind("SUPER + SHIFT + up", hl.dsp.window.move({ direction = "u" }))
@@ -57,80 +50,48 @@ hl.bind("SUPER + SHIFT + K", hl.dsp.window.move({ direction = "u" }))
 hl.bind("SUPER + SHIFT + J", hl.dsp.window.move({ direction = "d" }))
 
 -- RESIZE WINDOWS
--- the big hack with hyprctl is to enable animations for manual resizing with keyboard but not with mouse
--- CHANGE: these are now hl.bind with { repeating = true } flag (the old binde → repeating)
-hl.bind(
-	"SUPER + CTRL + left",
-	hl.dsp.exec_cmd(
-		'hyprctl --batch "keyword misc:animate_manual_resizes true ; dispatch resizeactive -'
-			.. vars.resizeAmount
-			.. ' 0 ; keyword misc:animate_manual_resizes false"'
-	),
-	{ repeating = true }
-)
-hl.bind(
-	"SUPER + CTRL + right",
-	hl.dsp.exec_cmd(
-		'hyprctl --batch "keyword misc:animate_manual_resizes true ; dispatch resizeactive '
-			.. vars.resizeAmount
-			.. ' 0 ; keyword misc:animate_manual_resizes false"'
-	),
-	{ repeating = true }
-)
-hl.bind(
-	"SUPER + CTRL + up",
-	hl.dsp.exec_cmd(
-		'hyprctl --batch "keyword misc:animate_manual_resizes true ; dispatch resizeactive 0 '
-			.. vars.resizeAmount
-			.. ' ; keyword misc:animate_manual_resizes false"'
-	),
-	{ repeating = true }
-)
-hl.bind(
-	"SUPER + CTRL + down",
-	hl.dsp.exec_cmd(
-		'hyprctl --batch "keyword misc:animate_manual_resizes true ; dispatch resizeactive 0 -'
-			.. vars.resizeAmount
-			.. ' ; keyword misc:animate_manual_resizes false"'
-	),
-	{ repeating = true }
-)
-hl.bind(
-	"SUPER + CTRL + H",
-	hl.dsp.exec_cmd(
-		'hyprctl --batch "keyword misc:animate_manual_resizes true ; dispatch resizeactive -'
-			.. vars.resizeAmount
-			.. ' 0 ; keyword misc:animate_manual_resizes false"'
-	),
-	{ repeating = true }
-)
-hl.bind(
-	"SUPER + CTRL + L",
-	hl.dsp.exec_cmd(
-		'hyprctl --batch "keyword misc:animate_manual_resizes true ; dispatch resizeactive '
-			.. vars.resizeAmount
-			.. ' 0 ; keyword misc:animate_manual_resizes false"'
-	),
-	{ repeating = true }
-)
-hl.bind(
-	"SUPER + CTRL + K",
-	hl.dsp.exec_cmd(
-		'hyprctl --batch "keyword misc:animate_manual_resizes true ; dispatch resizeactive 0 '
-			.. vars.resizeAmount
-			.. ' ; keyword misc:animate_manual_resizes false"'
-	),
-	{ repeating = true }
-)
-hl.bind(
-	"SUPER + CTRL + J",
-	hl.dsp.exec_cmd(
-		'hyprctl --batch "keyword misc:animate_manual_resizes true ; dispatch resizeactive 0 -'
-			.. vars.resizeAmount
-			.. ' ; keyword misc:animate_manual_resizes false"'
-	),
-	{ repeating = true }
-)
+-- Hack to enable animations for manual resizing with keyboard but not with mouse
+-- TODO: 1 animate_manual_resizes doesn't work in tiled (at least in master), it does work floating
+hl.bind("SUPER + CTRL + left", function()
+	hl.config({ misc = { animate_manual_resizes = true } })
+	hl.dispatch(hl.dsp.window.resize({ x = vars.resizeAmount * -1, y = 0, relative = true }))
+	hl.config({ misc = { animate_manual_resizes = false } })
+end, { repeating = true })
+hl.bind("SUPER + CTRL + right", function()
+	hl.config({ misc = { animate_manual_resizes = true } })
+	hl.dispatch(hl.dsp.window.resize({ x = vars.resizeAmount, y = 0, relative = true }))
+	hl.config({ misc = { animate_manual_resizes = false } })
+end, { repeating = true })
+hl.bind("SUPER + CTRL + up", function()
+	hl.config({ misc = { animate_manual_resizes = true } })
+	hl.dispatch(hl.dsp.window.resize({ x = 0, y = vars.resizeAmount, relative = true }))
+	hl.config({ misc = { animate_manual_resizes = false } })
+end, { repeating = true })
+hl.bind("SUPER + CTRL + down", function()
+	hl.config({ misc = { animate_manual_resizes = true } })
+	hl.dispatch(hl.dsp.window.resize({ x = 0, y = vars.resizeAmount * -1, relative = true }))
+	hl.config({ misc = { animate_manual_resizes = false } })
+end, { repeating = true })
+hl.bind("SUPER + CTRL + H", function()
+	hl.config({ misc = { animate_manual_resizes = true } })
+	hl.dispatch(hl.dsp.window.resize({ x = vars.resizeAmount * -1, y = 0, relative = true }))
+	hl.config({ misc = { animate_manual_resizes = false } })
+end, { repeating = true })
+hl.bind("SUPER + CTRL + L", function()
+	hl.config({ misc = { animate_manual_resizes = true } })
+	hl.dispatch(hl.dsp.window.resize({ x = vars.resizeAmount, y = 0, relative = true }))
+	hl.config({ misc = { animate_manual_resizes = false } })
+end, { repeating = true })
+hl.bind("SUPER + CTRL + K", function()
+	hl.config({ misc = { animate_manual_resizes = true } })
+	hl.dispatch(hl.dsp.window.resize({ x = 0, y = vars.resizeAmount, relative = true }))
+	hl.config({ misc = { animate_manual_resizes = false } })
+end, { repeating = true })
+hl.bind("SUPER + CTRL + J", function()
+	hl.config({ misc = { animate_manual_resizes = true } })
+	hl.dispatch(hl.dsp.window.resize({ x = 0, y = vars.resizeAmount * -1, relative = true }))
+	hl.config({ misc = { animate_manual_resizes = false } })
+end, { repeating = true })
 
 -- APPS
 -- bind = SUPER, Tab, exec, wayxec --normal-window
@@ -139,7 +100,7 @@ hl.bind("SUPER + M", hl.dsp.exec_cmd("resources"))
 hl.bind("SUPER + Q", hl.dsp.exec_cmd(vars.terminal))
 hl.bind("SUPER + T", hl.dsp.exec_cmd("alacritty"))
 hl.bind("SUPER + W", hl.dsp.exec_cmd("obsidian"))
-hl.bind("SUPER + E", hl.dsp.exec_cmd("QT_QPA_PLATFORMTHEME=kvantum " .. vars.fileManager)) -- hack to fix font size bug with stylix, remove when fixed
+hl.bind("SUPER + E", hl.dsp.exec_cmd("QT_QPA_PLATFORMTHEME=kvantum " .. vars.fileManager)) -- hack to fix font size bug with stylix
 hl.bind("SUPER + R", hl.dsp.exec_cmd(vars.browser))
 
 -- SCREENSHOT
@@ -195,7 +156,7 @@ hl.bind("SUPER + SHIFT + CTRL + 3", hl.dsp.window.move({ workspace = "special:3"
 hl.bind("SUPER + SHIFT + CTRL + 4", hl.dsp.window.move({ workspace = "special:4", follow = false }))
 -- Close special workspace
 hl.bind("Escape", hl.dsp.exec_cmd("close_special_workspace 0"), { non_consuming = true })
-hl.bind("SUPER + Escape", hl.dsp.exec_cmd("close_special_workspace"), { non_consuming = true })
+hl.bind("SUPER + Escape", hl.dsp.exec_cmd("close_special_workspace"))
 
 -- Move/resize windows with SUPER + LMB/RMB and dragging
 hl.bind("SUPER + mouse:272", hl.dsp.window.drag(), { mouse = true, description = "Move window" })
