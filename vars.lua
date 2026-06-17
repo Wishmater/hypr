@@ -11,7 +11,11 @@ M.browser = "firefox-devedition"
 
 -- Monitors / Workspaces
 M.workspaceCount = 4
-M.monitors = { "DP-3", "HDMI-A-1", "DP-1" }
+M.monitors = {
+	{ id = "DP-3", orientation = "horizontal", layout = "master" },
+	{ id = "HDMI-A-1", orientation = "vertical", layout = "scrolling" },
+	{ id = "DP-1", orientation = "horizontal", layout = "master" },
+}
 -- TODO: 1 remove these, everything should use the new monitors array
 M.monitor1 = "DP-3"
 M.monitor2 = "HDMI-A-1"

@@ -1,26 +1,35 @@
--- Assign workspaces per monitor
+-- assign workspaces per monitor
 for workspace_index = 1, vars.workspaceCount do
 	workspace_id_offset = (workspace_index - 1) * #vars.monitors
 	for monitor_index, monitor in ipairs(vars.monitors) do
 		hl.workspace_rule({
 			workspace = tostring(workspace_id_offset + monitor_index),
-			monitor = monitor,
+			monitor = monitor.id,
+			layout = monitor.layout,
 			default = workspace_index == 1,
-			layout = monitor_index == 2 and "scrolling" or nil,
 		})
 	end
 end
 
--- make special workspaces 3x the gaps as normal workspaces
-for workspace_index = 1, vars.workspaceCount do
+-- assign gaps per monitor orientation
+for _, monitor in ipairs(vars.monitors) do
 	hl.workspace_rule({
-		workspace = "special:" .. workspace_index,
-		gaps_in = vars.aspectRatioGaps(9, 16 / 9),
-		gaps_out = vars.aspectRatioGaps(36, 16 / 9),
+		workspace = "s[false]m[" .. monitor.id .. "]",
+		gaps_in = vars.aspectRatioGaps(3, 16 / 9, monitor.orientation == "horizontal"),
+		gaps_out = vars.aspectRatioGaps(12, 16 / 9, monitor.orientation == "horizontal"),
 	})
 end
 
+-- make special workspaces 3x the gaps as normal workspaces
+hl.workspace_rule({
+	workspace = "s[true]",
+	gaps_in = vars.aspectRatioGaps(9, 16 / 9),
+	gaps_out = vars.aspectRatioGaps(36, 16 / 9),
+})
+
 -- Monitor-specific layout options, like direction/orientation
+for monitor_index, monitor in ipairs(vars.monitors) do
+end
 
 -- Monitor 1
 -- Master
