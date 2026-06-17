@@ -1,5 +1,3 @@
--- https://wiki.hyprland.org/Configuring/Variables/#general
-
 vars.setConfig({
 	general = {
 		gaps_in = 3, -- used to be 4, this will be increased for larges side on each monitor, so it should be a bit lower than expected average
@@ -8,36 +6,19 @@ vars.setConfig({
 		border_size = 2,
 
 		col = {
-			active_border = { colors = { "rgb(33ccff)", "rgba(529E9399)", "rgb(98BB6C)" }, angle = 90 }, -- defaultHyprCyan interpWithLowerLuminance+opacity springGreen
-			inactive_border = "rgba(625e5aaa)", -- dragonBlack6
+			inactive_border = vars.colors.dragonBlack5,
+			active_border = {
+				angle = 120,
+				colors = {
+					vars.colors.dragonTeal,
+					vars.colors.dragonBlue2,
+					vars.colors.dragonAqua,
+					vars.colors.dragonGreen,
+				},
+			},
 		},
 	},
-})
 
--- https://wiki.hyprland.org/Configuring/Variables/#misc
-vars.setConfig({
-	misc = {
-		font_family = "JetBrainsMono Nerd Font",
-		background_color = "rgb(0d0c0c)", -- this isn't used if there is a background, but whatever # dragonBlack0
-
-		force_default_wallpaper = -1, -- Set to 0 or 1 to disable the anime mascot wallpapers
-		disable_hyprland_logo = false, -- If true disables the random hyprland logo / anime girl background. :(
-		disable_splash_rendering = false,
-		col = {
-			splash = "rgb(c5c9c5)", -- splash text color # dragonWhite
-		},
-		-- splash_font_family
-	},
-})
-
-vars.setConfig({
-	ecosystem = {
-		no_donation_nag = true,
-	},
-})
-
--- https://wiki.hyprland.org/Configuring/Variables/#decoration
-vars.setConfig({
 	decoration = {
 		rounding = 12,
 		rounding_power = 4,
@@ -51,7 +32,6 @@ vars.setConfig({
 		dim_special = 0.4,
 		-- dim_special = 0 -- SET FOR TRANSPARENT SPECIAL WORKSPACE
 
-		-- https://wiki.hyprland.org/Configuring/Variables/#shadow
 		shadow = {
 			enabled = true,
 			range = 8,
@@ -60,7 +40,6 @@ vars.setConfig({
 			color = "rgba(0d0c0caa)", -- dragonBlack0
 		},
 
-		-- https://wiki.hyprland.org/Configuring/Variables/#blur
 		blur = {
 			enabled = true,
 			size = 3,
@@ -72,13 +51,20 @@ vars.setConfig({
 			-- special = false -- SET FOR TRANSPARENT SPECIAL WORKSPACE
 		},
 	},
-})
 
--- https://wiki.hyprland.org/Configuring/Advanced-and-Cool/Animations/
-
-vars.setConfig({
 	animations = {
 		enabled = true,
+	},
+
+	misc = {
+		disable_splash_rendering = false,
+		col = {
+			splash = vars.colors.dragonWhite, -- splash text color
+		},
+	},
+
+	ecosystem = {
+		no_donation_nag = true,
 	},
 })
 

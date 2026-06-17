@@ -29,11 +29,18 @@ for _, monitor in ipairs(vars.monitors) do
 	-- layout/orientation-specific options
 	-- we can just set options for all layouts, because they are only used when enabled
 	-- if monitor.layout == "master" then
+	if monitor.centerSingleWindow == nil then
+		monitor.centerSingleWindow = true
+	end
+	if monitor.centerTooManyWindows == nil then
+		monitor.centerTooManyWindows = true
+	end
 	hl.workspace_rule({
 		workspace = "m[" .. monitor.id .. "]w[tv1]",
 		layout_opts = {
-			-- TODO: 1 should just be chenter, this hack is because master layout doesn't work properly on vertical monitors
-			orientation = monitor.orientation == "horizontal" and "center" or "right",
+			-- TODO: 1 this orientation hack is because master layout doesn't work properly on vertical monitors
+			orientation = monitor.orientation == "vertical" and "right"
+				or (monitor.centerSingleWindow and "center" or vars.directionForMaster(monitor.direction)),
 		},
 	})
 	hl.workspace_rule({
@@ -43,9 +50,9 @@ for _, monitor in ipairs(vars.monitors) do
 	hl.workspace_rule({
 		workspace = "m[" .. monitor.id .. "]w[tv7-999999]",
 		layout_opts = {
-			-- TODO: 1 should just be chenter, this hack is because master layout doesn't work properly on vertical monitors
-			orientation = monitor.orientation == "horizontal" and "center"
-				or vars.directionForMaster(monitor.direction),
+			-- TODO: 1 this orientation hack is because master layout doesn't work properly on vertical monitors
+			orientation = monitor.orientation == "vertical" and vars.directionForMaster(monitor.direction)
+				or (monitor.centerTooManyWindows and "center" or vars.directionForMaster(monitor.direction)),
 		},
 	})
 	-- elseif monitor.layout == "scrolling" then
