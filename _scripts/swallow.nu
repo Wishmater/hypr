@@ -5,8 +5,9 @@ use std/log
 # Run a command so its window replaces the current terminal window via Hyprland groups.
 #
 # The focused window is grouped, the command runs as a child of the shell,
-# and any new window that spawns auto-joins the group. When the command
-# exits, the group is torn down and the terminal reappears.
+# and any new window that spawns auto-joins the group. Once the new window
+# is detected, auto_group is restored so unrelated windows aren't affected.
+# When the command exits, the group is torn down and the terminal reappears.
 #
 # This avoids Hyprland's PID-based swallow mechanism, which is unreliable
 # with single-instance terminals (ghostty) where all windows share a PID.
@@ -25,28 +26,88 @@ def main [command: string, ...args: string] {
     let oldAddress = $active.address
     log debug $"focused window: ($oldAddress) class=($active.class)"
 
+    # snapshot current windows to detect the new one later
+    let beforeAddresses = (^hyprctl -j clients | from json | get address)
+
     # briefly enable auto_group so new windows from our command
     # automatically join the focused window's group
     if $autoGroupWas == 0 {
-        ^hyprctl eval "hl.config({ group = { auto_group = true } })"
+        ^hyprctl eval "hl.config({ group = { auto_group = true } })" out> /dev/null
     }
 
     # create a group on the focused window — the new app window will join it
-    ^hyprctl dispatch "hl.dsp.group.toggle()"
-    log info $"group opened on ($oldAddress), running ($command)..."
+    let groupDispatch = ("hl.dsp.group.toggle({ window = \"address:" + $oldAddress + "\" })")
+    ^hyprctl dispatch $groupDispatch out> /dev/null
+    log info $"group opened, running ($command)..."
 
-    # run the command; blocks until it exits (app window closes)
-    # when it returns, the new window has been destroyed and the terminal
-    # is left alone in a group of size 1 — we tear it down below
-    ^$command ...$args
+    # build bash-safe escaped command string
+    let cmdStr = ([$command ...$args] | each {|a| bash-escape $a} | str join ' ')
 
-    # tear down the now-size-1 group so the terminal is a normal window again
-    ^hyprctl dispatch "hl.dsp.group.toggle()"
+    # start command in background via bash:
+    #   stdout/stderr → /dev/tty (the terminal, so user sees output)
+    #   PID captured from $! to detect crashes
+    let pid = (^bash "-c" $"($cmdStr) >/dev/tty 2>/dev/tty & echo \$!" | str trim | into int)
 
-    # restore previous auto_group state
-    if $autoGroupWas == 0 {
-        ^hyprctl eval "hl.config({ group = { auto_group = false } })"
+    # wait for a new window spawned by our command to appear;
+    # also bail early if the command crashes before spawning anything
+    mut newAddress = null
+    for i in 1..50 {
+        if not (is-alive $pid) {
+            log warning "command exited before spawning a window"
+            break
+        }
+        let current = (^hyprctl -j clients | from json | get address)
+        let candidates = ($current | where {|a| $a not-in $beforeAddresses and $a != $oldAddress})
+        if ($candidates | length) > 0 {
+            $newAddress = $candidates.0
+            break
+        }
+        sleep 100ms
     }
 
-    log info "done"
+    # restore auto_group immediately so unrelated windows don't get grouped
+    if $autoGroupWas == 0 {
+        ^hyprctl eval "hl.config({ group = { auto_group = false } })" out> /dev/null
+    }
+
+    if $newAddress == null {
+        # nothing spawned — tear down the empty group
+        log warning "no new window detected"
+        ^hyprctl dispatch $groupDispatch out> /dev/null
+        return
+    }
+
+    log info $"new window ($newAddress) grouped, auto_group restored"
+
+    # wait for the app window to close
+    loop {
+        sleep 1sec
+        let clients = (^hyprctl -j clients | from json)
+        if ($clients | where address == $newAddress | is-empty) {
+            break
+        }
+    }
+
+    # app closed — tear down the now-size-1 group on the original window
+    ^hyprctl dispatch $groupDispatch out> /dev/null
+    log info "app closed, group torn down"
+}
+
+# escape a string for safe inclusion in a bash single-quoted string
+def bash-escape [s: string] {
+    let q = "'"
+    # within a bash single-quoted string, the only character that
+    # needs escaping is the single quote itself: ' → '\''
+    let esc = ($q + "\\" + $q + $q)
+    $q + ($s | str replace --all $q $esc) + $q
+}
+
+# check whether a process is still alive by PID
+def is-alive [pid: int] {
+    try {
+        ^kill -0 $pid out> /dev/null err> /dev/null
+        true
+    } catch {
+        false
+    }
 }
