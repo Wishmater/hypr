@@ -100,7 +100,7 @@ hl.bind("SUPER + M", hl.dsp.exec_cmd("resources"))
 hl.bind("SUPER + Q", hl.dsp.exec_cmd(vars.terminal))
 hl.bind("SUPER + T", hl.dsp.exec_cmd("alacritty"))
 hl.bind("SUPER + W", hl.dsp.exec_cmd("obsidian"))
-hl.bind("SUPER + E", hl.dsp.exec_cmd("QT_QPA_PLATFORMTHEME=kvantum " .. vars.fileManager)) -- hack to fix font size bug with stylix
+hl.bind("SUPER + E", hl.dsp.exec_cmd(vars.fileManager))
 hl.bind("SUPER + R", hl.dsp.exec_cmd(vars.browser))
 
 -- SCREENSHOT

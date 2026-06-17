@@ -15,8 +15,8 @@ require("window_rules")
 require("workspaces")
 
 hl.config({
-    debug = {
-        -- disable_logs = false,
-        -- overlay = true,
-    },
+	debug = {
+		-- disable_logs = false,
+		-- overlay = true,
+	},
 })

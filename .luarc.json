@@ -11,5 +11,8 @@
   "diagnostics.globals": [
     "hl"
   ],
-  "format.enable": false
+  "format.enable": false,
+    "diagnostics.disable": [
+        "lowercase-global"
+    ]
 }
