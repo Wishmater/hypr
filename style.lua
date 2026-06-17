@@ -2,8 +2,8 @@
 
 hl.config({
 	general = {
-		gaps_in = vars.aspectRatioGaps(3, 16 / 9), -- 4
-		gaps_out = vars.aspectRatioGaps(12, 16 / 9), -- 16
+		gaps_in = 3, -- used to be 4, this will be increased for larges side on each monitor, so it should be a bit lower than expected average
+		gaps_out = 12, -- used to be 12, this will be increased for larges side on each monitor, so it should be a bit lower than expected average
 
 		border_size = 2,
 

@@ -15,44 +15,43 @@ end
 for _, monitor in ipairs(vars.monitors) do
 	hl.workspace_rule({
 		workspace = "s[false]m[" .. monitor.id .. "]",
-		gaps_in = vars.aspectRatioGaps(3, 16 / 9, monitor.orientation == "horizontal"),
-		gaps_out = vars.aspectRatioGaps(12, 16 / 9, monitor.orientation == "horizontal"),
+		gaps_in = vars.aspectRatioGaps(3, 16 / 9, monitor.orientation),
+		gaps_out = vars.aspectRatioGaps(12, 16 / 9, monitor.orientation),
 	})
+
+	-- make special workspaces 3x the gaps as normal workspaces
+	hl.workspace_rule({
+		workspace = "s[true]m[" .. monitor.id .. "]",
+		gaps_in = vars.aspectRatioGaps(9, 16 / 9, monitor.orientation),
+		gaps_out = vars.aspectRatioGaps(36, 16 / 9, monitor.orientation),
+	})
+
+	-- layout/orientation-specific options
+	-- we can just set options for all layouts, because they are only used when enabled
+	-- if monitor.layout == "master" then
+	hl.workspace_rule({
+		workspace = "m[" .. monitor.id .. "]w[tv1]",
+		layout_opts = {
+			-- TODO: 1 should just be chenter, this hack is because master layout doesn't work properly on vertical monitors
+			orientation = monitor.orientation == "horizontal" and "center" or "right",
+		},
+	})
+	hl.workspace_rule({
+		workspace = "m[" .. monitor.id .. "]w[tv2-6]",
+		layout_opts = { orientation = vars.directionForMaster(monitor.direction) },
+	})
+	hl.workspace_rule({
+		workspace = "m[" .. monitor.id .. "]w[tv7-999999]",
+		layout_opts = {
+			-- TODO: 1 should just be chenter, this hack is because master layout doesn't work properly on vertical monitors
+			orientation = monitor.orientation == "horizontal" and "center"
+				or vars.directionForMaster(monitor.direction),
+		},
+	})
+	-- elseif monitor.layout == "scrolling" then
+	hl.workspace_rule({
+		workspace = "m[" .. monitor.id .. "]",
+		layout_opts = { direction = vars.directionForScrolling(monitor.direction) },
+	})
+	-- end
 end
-
--- make special workspaces 3x the gaps as normal workspaces
-hl.workspace_rule({
-	workspace = "s[true]",
-	gaps_in = vars.aspectRatioGaps(9, 16 / 9),
-	gaps_out = vars.aspectRatioGaps(36, 16 / 9),
-})
-
--- Monitor-specific layout options, like direction/orientation
-for monitor_index, monitor in ipairs(vars.monitors) do
-end
-
--- Monitor 1
--- Master
-hl.workspace_rule({ workspace = "m[" .. vars.monitor1 .. "]w[tv1]", layout_opts = { orientation = "center" } })
-hl.workspace_rule({ workspace = "m[" .. vars.monitor1 .. "]w[tv2-6]", layout_opts = { orientation = "right" } })
-hl.workspace_rule({ workspace = "m[" .. vars.monitor1 .. "]w[tv7-999999]", layout_opts = { orientation = "center" } })
--- Scrolling
-hl.workspace_rule({ workspace = "m[" .. vars.monitor1 .. "]", layout_opts = { direction = "right" } })
-
--- Monitor 2
--- Master
--- master layout has some issues with vertical monitors, check new versions for fixes
--- this could be a workaround IF IT WORKED
--- workspace = m[$monitor2], layoutopt:always_keep_position:false
-hl.workspace_rule({ workspace = "m[" .. vars.monitor2 .. "]w[tv1]", layout_opts = { orientation = "right" } }) -- center
-hl.workspace_rule({ workspace = "m[" .. vars.monitor2 .. "]w[tv2-4]", layout_opts = { orientation = "bottom" } })
-hl.workspace_rule({ workspace = "m[" .. vars.monitor2 .. "]w[tv5-999999]", layout_opts = { orientation = "bottom" } }) -- center
--- Scrolling
-hl.workspace_rule({ workspace = "m[" .. vars.monitor2 .. "]", layout_opts = { direction = "down" } })
-
--- Monitor 3
--- Master
-hl.workspace_rule({ workspace = "m[" .. vars.monitor3 .. "]w[tv1-6]", layout_opts = { orientation = "left" } })
-hl.workspace_rule({ workspace = "m[" .. vars.monitor3 .. "]w[tv7-999999]", layout_opts = { orientation = "center" } })
--- Scrolling
-hl.workspace_rule({ workspace = "m[" .. vars.monitor3 .. "]", layout_opts = { direction = "left" } })
