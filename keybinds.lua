@@ -1,7 +1,7 @@
 -- https://wiki.hyprland.org/Configuring/Basics/Binds/
 -- https://wiki.hyprland.org/Configuring/Keywords/
 
-vars.set_config({
+vars.setConfig({
 	binds = {
 		scroll_event_delay = 0,
 	},

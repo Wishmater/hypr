@@ -14,7 +14,7 @@ require("style")
 require("window_rules")
 require("workspaces")
 
-vars.set_config({
+vars.setConfig({
 	debug = {
 		-- disable_logs = false,
 		-- overlay = true,

@@ -1,12 +1,12 @@
 -- assign workspaces per monitor
-for workspace_index = 1, vars.workspaceCount do
-	workspace_id_offset = (workspace_index - 1) * #vars.monitors
-	for monitor_index, monitor in ipairs(vars.monitors) do
+for workspaceIndex = 1, vars.workspaceCount do
+	workspaceIdOffset = (workspaceIndex - 1) * #vars.monitors
+	for monitorIndex, monitor in ipairs(vars.monitors) do
 		hl.workspace_rule({
-			workspace = tostring(workspace_id_offset + monitor_index),
+			workspace = tostring(workspaceIdOffset + monitorIndex),
 			monitor = monitor.id,
 			layout = monitor.layout,
-			default = workspace_index == 1,
+			default = workspaceIndex == 1,
 		})
 	end
 end
@@ -19,11 +19,11 @@ for _, monitor in ipairs(vars.monitors) do
 		gaps_out = vars.aspectRatioGaps(vars.baseConfig.general.gaps_out, 16 / 9, monitor.orientation),
 	})
 
-	-- make special workspaces 3x the gaps as normal workspaces
+	-- make special workspaces have more gaps than normal workspaces
 	hl.workspace_rule({
 		workspace = "s[true]m[" .. monitor.id .. "]",
-		gaps_in = vars.aspectRatioGaps(9, 16 / 9, monitor.orientation),
-		gaps_out = vars.aspectRatioGaps(36, 16 / 9, monitor.orientation),
+		gaps_in = vars.aspectRatioGaps(vars.baseConfig.general.gaps_in, 16 / 9, monitor.orientation, 2),
+		gaps_out = vars.aspectRatioGaps(vars.baseConfig.general.gaps_out, 16 / 9, monitor.orientation, 2),
 	})
 
 	-- layout/orientation-specific options

@@ -1,10 +1,7 @@
--- Shared config variables. Require this module to access them.
-
 local M = {}
 
 -- App variables
-M.terminal = "ghostty"
--- M.terminal = "alacritty"
+M.terminal = "ghostty" -- alacritty
 M.editor = "nvim"
 M.fileManager = "dolphin"
 M.browser = "firefox-devedition"
@@ -13,11 +10,6 @@ M.browser = "firefox-devedition"
 M.workspaceCount = 4
 
 -- Monitors
----@class MonitorConfig
----@field id string
----@field layout 'master'|'dwindle'|'scrolling'|'monocle'
----@field orientation 'horizontal'|'vertical'
----@field direction 'left'|'right'|'up'|'down'
 
 ---@type MonitorConfig[]
 M.monitors = {
@@ -25,39 +17,47 @@ M.monitors = {
 	{ id = "HDMI-A-1", layout = "scrolling", orientation = "vertical", direction = "down" },
 	{ id = "DP-1", layout = "master", orientation = "horizontal", direction = "left" },
 }
--- TODO: 1 remove these, everything should use the new monitors array
-M.monitor1 = "DP-3"
-M.monitor2 = "HDMI-A-1"
-M.monitor3 = "DP-1"
 
 -- Resize amount for keyboard resizing
 M.resizeAmount = 60
 
--- Utility functions
+-------------------------------------------------------------------------------
+-- Utility functions / definitions
+-------------------------------------------------------------------------------
+
+---@class MonitorConfig
+---@field id string
+---@field layout 'master'|'dwindle'|'scrolling'|'monocle'
+---@field orientation 'horizontal'|'vertical'
+---@field direction 'left'|'right'|'up'|'down'
+
 --- @param baseGap integer|HL.CssGap
 --- @param aspectRatio number
 --- @param orientation? 'horizontal'|'vertical'
+--- @param scale? number
 --- @return HL.CssGap
-M.aspectRatioGaps = function(baseGap, aspectRatio, orientation)
+M.aspectRatioGaps = function(baseGap, aspectRatio, orientation, scale)
 	orientation = orientation or "horizontal"
-	local function scale(v)
-		return v and math.floor(v * aspectRatio + 0.5) or nil
+	scale = scale or 1
+	local function wideVal(v)
+		return v and math.floor(v * aspectRatio * scale + 0.5) or nil
+	end
+	local function narrowVal(v)
+		return v and math.floor(v * scale + 0.5) or nil
 	end
 	if type(baseGap) == "number" then
-		local wide = scale(baseGap)
-		local narrow = baseGap
 		return {
-			left = orientation == "horizontal" and wide or narrow,
-			right = orientation == "horizontal" and wide or narrow,
-			top = orientation == "horizontal" and narrow or wide,
-			bottom = orientation == "horizontal" and narrow or wide,
+			left = orientation == "horizontal" and wideVal(baseGap) or narrowVal(baseGap),
+			right = orientation == "horizontal" and wideVal(baseGap) or narrowVal(baseGap),
+			top = orientation == "horizontal" and narrowVal(baseGap) or wideVal(baseGap),
+			bottom = orientation == "horizontal" and narrowVal(baseGap) or wideVal(baseGap),
 		}
 	end
 	return {
-		left = orientation == "horizontal" and scale(baseGap.left) or baseGap.left,
-		right = orientation == "horizontal" and scale(baseGap.right) or baseGap.right,
-		top = orientation == "horizontal" and baseGap.top or scale(baseGap.top),
-		bottom = orientation == "horizontal" and baseGap.bottom or scale(baseGap.bottom),
+		left = orientation == "horizontal" and wideVal(baseGap.left) or narrowVal(baseGap.left),
+		right = orientation == "horizontal" and wideVal(baseGap.right) or narrowVal(baseGap.right),
+		top = orientation == "horizontal" and narrowVal(baseGap.top) or wideVal(baseGap.top),
+		bottom = orientation == "horizontal" and narrowVal(baseGap.bottom) or wideVal(baseGap.bottom),
 	}
 end
 
@@ -80,10 +80,10 @@ M.directionForMaster = function(direction)
 end
 
 -- Config accumulation
-local function deep_merge(target, source)
+local function deepMerge(target, source)
 	for key, value in pairs(source) do
 		if type(value) == "table" and type(target[key]) == "table" then
-			deep_merge(target[key], value)
+			deepMerge(target[key], value)
 		else
 			target[key] = value
 		end
@@ -93,8 +93,8 @@ end
 --- @type HL.ConfigOpt
 M.baseConfig = {}
 
-function M.set_config(tbl)
-	deep_merge(M.baseConfig, tbl)
+function M.setConfig(tbl)
+	deepMerge(M.baseConfig, tbl)
 end
 
 return M
