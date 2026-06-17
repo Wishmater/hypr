@@ -9,7 +9,10 @@ M.editor = "nvim"
 M.fileManager = "dolphin"
 M.browser = "firefox-devedition"
 
--- Monitor names
+-- Monitors / Workspaces
+M.workspaceCount = 4
+M.monitors = { "DP-3", "HDMI-A-1", "DP-1" }
+-- TODO: 1 remove these, everything should use the new monitors array
 M.monitor1 = "DP-3"
 M.monitor2 = "HDMI-A-1"
 M.monitor3 = "DP-1"
