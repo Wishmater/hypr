@@ -67,37 +67,38 @@ vars.setConfig({
 		merge_groups_on_drag = false,
 		merge_groups_on_groupbar = true,
 
-		-- TODO 3 maybe change colors for groups ??
+		-- TODO: 3 maybe change colors for groups ??
 		col = {
-			border_active = { colors = { "rgb(33ccff)", "rgb(529E93)", "rgb(98BB6C)" }, angle = 90 }, -- defaultHyprCyan interpWithLowerLuminance springGreen
-			border_inactive = "rgba(625e5aaa)", -- dragonBlack6
-			border_locked_active = { colors = { "rgb(33ccff)", "rgb(529E93)", "rgb(98BB6C)" }, angle = 90 }, -- defaultHyprCyan interpWithLowerLuminance springGreen
-			border_locked_inactive = "rgba(625e5aaa)", -- dragonBlack6
+			border_active = vars.baseConfig.general.col.active_border,
+			border_inactive = vars.baseConfig.general.col.inactive_border,
+			border_locked_active = vars.baseConfig.general.col.active_border,
+			border_locked_inactive = vars.baseConfig.general.col.inactive_border,
 		},
 
 		groupbar = {
-			font_family = "JetBrainsMono Nerd Font",
-			font_size = 15,
-			font_weight_active = "ultraheavy", -- numeric values dont work for some fuckin reason :))
-			font_weight_inactive = "normal",
-			height = 24,
+			-- enabled = false,
+			font_size = 14,
+			font_weight_active = 500,
+			font_weight_inactive = 500,
+			text_color = vars.colors.dragonGray,
+			text_color_inactive = vars.colors.dragonGray3,
+
+			height = 22,
 			gradients = true, -- indicator is set as background of the full height of groupbar
-			gradient_rounding = 12,
+			gradient_rounding = 28,
+			gradient_rounding_power = 4,
 			gradient_round_only_edges = false,
 			gaps_in = 4,
 			gaps_out = 2,
 			indicator_height = 0,
 			rounding = 0,
 			scrolling = false,
+			blur = true,
+			keep_upper_gap = false,
 
-			text_color = "rgb(c5c9c5)", -- dragonWhite
-			-- # this would be cool, but seems to not be available in my version... try again after update
-			-- text_color_inactive = "rgb(ffffff)",
-			-- text_color_locked_active
-			-- text_color_locked_inactive
 			col = {
-				active = "rgba(2D4F67dd)",
-				inactive = "rgba(0d0c0cbb)", -- dragonBlack0
+				active = vars.colors.winterBlue .. "dd",
+				inactive = vars.colors.dragonBlack0 .. "aa",
 				-- locked_active
 				-- locked_inactive
 			},

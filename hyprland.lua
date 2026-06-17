@@ -2,17 +2,17 @@
 
 vars = require("vars")
 
-require("autostart")
 require("env")
-require("input")
-require("keybinds")
-require("layer_rules")
-require("layout")
 require("monitors")
-require("permissions")
+require("autostart")
+require("input")
 require("style")
-require("window_rules")
+require("layout")
 require("workspaces")
+require("window_rules")
+require("layer_rules")
+require("permissions")
+require("keybinds")
 
 vars.setConfig({
 	debug = {

@@ -20,24 +20,25 @@ vars.setConfig({
 	},
 
 	decoration = {
-		rounding = 12,
-		rounding_power = 4,
+		rounding = 1, -- 20
+		rounding_power = 256, -- 10
 
 		active_opacity = 1.0,
 		fullscreen_opacity = 1.0,
-		inactive_opacity = 1.0,
+		inactive_opacity = 0.996,
 
 		dim_inactive = true,
-		dim_strength = 0.1,
-		dim_special = 0.4,
-		-- dim_special = 0 -- SET FOR TRANSPARENT SPECIAL WORKSPACE
+		dim_strength = 0.33,
+		dim_special = 0.5,
+		dim_around = 0.5,
 
 		shadow = {
 			enabled = true,
 			range = 8,
-			render_power = 0,
-			offset = { 2, 2 }, -- CHANGE: vec2 values use table { x, y } instead of space-separated
-			color = "rgba(0d0c0caa)", -- dragonBlack0
+			render_power = 3, -- default 3
+			offset = { 2, 2 },
+			color = vars.colors.dragonBlack0 .. "aa",
+			color_inactive = vars.colors.dragonBlack2 .. "aa",
 		},
 
 		blur = {
@@ -45,15 +46,9 @@ vars.setConfig({
 			size = 3,
 			passes = 1,
 
-			vibrancy = 0.1696,
-
 			special = true, -- note: expensive
-			-- special = false -- SET FOR TRANSPARENT SPECIAL WORKSPACE
+			-- popups = true, -- this is cool but only makes sense if active_opacity<1
 		},
-	},
-
-	animations = {
-		enabled = true,
 	},
 
 	misc = {
