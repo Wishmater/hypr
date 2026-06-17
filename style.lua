@@ -2,8 +2,8 @@
 
 hl.config({
 	general = {
-		gaps_in = 4,
-		gaps_out = 12,
+		gaps_in = vars.aspectRatioGaps(3, 16 / 9), -- 4
+		gaps_out = vars.aspectRatioGaps(12, 16 / 9), -- 16
 
 		border_size = 2,
 
