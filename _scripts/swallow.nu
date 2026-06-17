@@ -36,9 +36,15 @@ def main [command: string, ...args: string] {
     }
 
     # create a group on the focused window — the new app window will join it
+    # but only if the window isn't already in a group (toggle inverts state)
+    let wasGrouped = ($active.grouped | length) > 0
     let groupDispatch = ("hl.dsp.group.toggle({ window = \"address:" + $oldAddress + "\" })")
-    ^hyprctl dispatch $groupDispatch out> /dev/null
-    log info $"group opened, running ($command)..."
+    if not $wasGrouped {
+        ^hyprctl dispatch $groupDispatch out> /dev/null
+        log info $"group opened, running ($command)..."
+    } else {
+        log info $"window already grouped, running ($command)..."
+    }
 
     # build bash-safe escaped command string
     let cmdStr = ([$command ...$args] | each {|a| bash-escape $a} | str join ' ')
@@ -71,9 +77,11 @@ def main [command: string, ...args: string] {
     }
 
     if $newAddress == null {
-        # nothing spawned — tear down the empty group
+        # nothing spawned — tear down the group if we created one
         log warning "no new window detected"
-        ^hyprctl dispatch $groupDispatch out> /dev/null
+        if not $wasGrouped {
+            ^hyprctl dispatch $groupDispatch out> /dev/null
+        }
         return
     }
 
@@ -88,9 +96,13 @@ def main [command: string, ...args: string] {
         }
     }
 
-    # app closed — tear down the now-size-1 group on the original window
-    ^hyprctl dispatch $groupDispatch out> /dev/null
-    log info "app closed, group torn down"
+    # app closed — tear down the group if we created one
+    if not $wasGrouped {
+        ^hyprctl dispatch $groupDispatch out> /dev/null
+        log info "app closed, group torn down"
+    } else {
+        log info "app closed"
+    }
 }
 
 # escape a string for safe inclusion in a bash single-quoted string
