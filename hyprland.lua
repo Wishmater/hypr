@@ -14,9 +14,11 @@ require("style")
 require("window_rules")
 require("workspaces")
 
-hl.config({
+vars.set_config({
 	debug = {
 		-- disable_logs = false,
 		-- overlay = true,
 	},
 })
+
+hl.config(vars.baseConfig)

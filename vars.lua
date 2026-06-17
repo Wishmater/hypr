@@ -34,17 +34,30 @@ M.monitor3 = "DP-1"
 M.resizeAmount = 60
 
 -- Utility functions
---- @param baseGap integer
+--- @param baseGap integer|HL.CssGap
 --- @param aspectRatio number
 --- @param orientation? 'horizontal'|'vertical'
 --- @return HL.CssGap
 M.aspectRatioGaps = function(baseGap, aspectRatio, orientation)
 	orientation = orientation or "horizontal"
+	local function scale(v)
+		return v and math.floor(v * aspectRatio + 0.5) or nil
+	end
+	if type(baseGap) == "number" then
+		local wide = scale(baseGap)
+		local narrow = baseGap
+		return {
+			left = orientation == "horizontal" and wide or narrow,
+			right = orientation == "horizontal" and wide or narrow,
+			top = orientation == "horizontal" and narrow or wide,
+			bottom = orientation == "horizontal" and narrow or wide,
+		}
+	end
 	return {
-		left = orientation == "horizontal" and math.floor(baseGap * aspectRatio + 0.5) or baseGap,
-		right = orientation == "horizontal" and math.floor(baseGap * aspectRatio + 0.5) or baseGap,
-		top = orientation == "horizontal" and baseGap or math.floor(baseGap * aspectRatio + 0.5),
-		bottom = orientation == "horizontal" and baseGap or math.floor(baseGap * aspectRatio + 0.5),
+		left = orientation == "horizontal" and scale(baseGap.left) or baseGap.left,
+		right = orientation == "horizontal" and scale(baseGap.right) or baseGap.right,
+		top = orientation == "horizontal" and baseGap.top or scale(baseGap.top),
+		bottom = orientation == "horizontal" and baseGap.bottom or scale(baseGap.bottom),
 	}
 end
 
@@ -64,6 +77,24 @@ M.directionForMaster = function(direction)
 		return "bottom"
 	end
 	return direction
+end
+
+-- Config accumulation
+local function deep_merge(target, source)
+	for key, value in pairs(source) do
+		if type(value) == "table" and type(target[key]) == "table" then
+			deep_merge(target[key], value)
+		else
+			target[key] = value
+		end
+	end
+end
+
+--- @type HL.ConfigOpt
+M.baseConfig = {}
+
+function M.set_config(tbl)
+	deep_merge(M.baseConfig, tbl)
 end
 
 return M

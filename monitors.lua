@@ -32,14 +32,14 @@ hl.monitor({
 })
 
 -- https://wiki.hyprland.org/Configuring/Variables/#misc
-hl.config({
+vars.set_config({
     misc = {
         vrr                  = 2,  -- Variable Refresh Rate (Adaptive Sync) -- 2 = only fullscreen
         render_unfocused_fps = 15, -- default 15 -- does this mean 2nd window videos are capped ?? maybe add some exceptions in window rules, check variable descrip
     },
 })
 
-hl.config({
+vars.set_config({
     render = {
         -- HDR options
         -- cm_fs_passthrough = 1 -- Passthrough color settings for fullscreen apps when possible. 0 - off, 1 - always, 2 - hdr only
@@ -50,7 +50,7 @@ hl.config({
     },
 })
 
-hl.config({
+vars.set_config({
     quirks = {
         prefer_hdr = 1,
     },

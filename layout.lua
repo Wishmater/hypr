@@ -1,6 +1,6 @@
 -- layout settings
 
-hl.config({
+vars.set_config({
     general = {
         layout = "master",
         -- layout = "dwindle",
@@ -18,7 +18,7 @@ hl.config({
 })
 
 -- https://wiki.hypr.land/Configuring/Master-Layout/
-hl.config({
+vars.set_config({
     master = {
         -- # orientation is set with workspace rules on a per-monitor basis
         -- orientation = "top", -- placement of master window
@@ -43,13 +43,13 @@ hl.config({
 })
 
 -- See https://wiki.hyprland.org/Configuring/Layouts/Dwindle-Layout/ for more
-hl.config({
+vars.set_config({
     dwindle = {
         preserve_split  = true, -- You probably want this
     },
 })
 
-hl.config({
+vars.set_config({
     scrolling = {
         fullscreen_on_one_column = false,
         column_width             = 0.68359375,
@@ -59,7 +59,7 @@ hl.config({
 })
 
 -- https://wiki.hyprland.org/Configuring/Variables/#misc
-hl.config({
+vars.set_config({
     misc = {
         close_special_on_empty = true,
         -- TODO: 2 this is annoying specifically with telegram calls while gaming, maybe we can just fix telegram call popup window to open somewhere else, or set this option to ignore new window (0) while gaming
@@ -71,7 +71,7 @@ hl.config({
     },
 })
 
-hl.config({
+vars.set_config({
     binds = {
         hide_special_on_workspace_change = true,
         -- infer by length, instead of history, to avoid unpredictability
@@ -84,7 +84,7 @@ hl.config({
     },
 })
 
-hl.config({
+vars.set_config({
     group = {
         auto_group             = false,
         insert_after_current   = false,

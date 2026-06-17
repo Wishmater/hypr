@@ -1,6 +1,6 @@
 -- https://wiki.hyprland.org/Configuring/Variables/#input
 
-hl.config({
+vars.set_config({
     input = {
         -- Keyboard
         kb_layout           = "us,es",

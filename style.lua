@@ -1,6 +1,6 @@
 -- https://wiki.hyprland.org/Configuring/Variables/#general
 
-hl.config({
+vars.set_config({
 	general = {
 		gaps_in = 3, -- used to be 4, this will be increased for larges side on each monitor, so it should be a bit lower than expected average
 		gaps_out = 12, -- used to be 12, this will be increased for larges side on each monitor, so it should be a bit lower than expected average
@@ -15,7 +15,7 @@ hl.config({
 })
 
 -- https://wiki.hyprland.org/Configuring/Variables/#misc
-hl.config({
+vars.set_config({
 	misc = {
 		font_family = "JetBrainsMono Nerd Font",
 		background_color = "rgb(0d0c0c)", -- this isn't used if there is a background, but whatever # dragonBlack0
@@ -30,14 +30,14 @@ hl.config({
 	},
 })
 
-hl.config({
+vars.set_config({
 	ecosystem = {
 		no_donation_nag = true,
 	},
 })
 
 -- https://wiki.hyprland.org/Configuring/Variables/#decoration
-hl.config({
+vars.set_config({
 	decoration = {
 		rounding = 12,
 		rounding_power = 4,
@@ -76,7 +76,7 @@ hl.config({
 
 -- https://wiki.hyprland.org/Configuring/Advanced-and-Cool/Animations/
 
-hl.config({
+vars.set_config({
 	animations = {
 		enabled = true,
 	},

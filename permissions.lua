@@ -1,6 +1,6 @@
 -- https://wiki.hyprland.org/Configuring/Advanced-and-Cool/Permissions/
 
-hl.config({
+vars.set_config({
     ecosystem = {
         enforce_permissions = true,
     },
