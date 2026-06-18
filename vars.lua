@@ -105,44 +105,40 @@ function M.setConfig(tbl)
 	deepMerge(M.baseConfig, tbl)
 end
 
-local uglymode = false
-function M.toggleUglymode()
-	uglymode = not uglymode
+--- Takes a partial config, applies it, and returns a callback that reverts
+--- the touched keys to their pre-call values from baseConfig.
+--- @param newConfig HL.ConfigOpt
+--- @return fun()
+M.withConfig = function(newConfig)
+	local revertConfig = {}
+	local function snapshot(src, dst, partial)
+		for key, val in pairs(partial) do
+			if type(val) == "table" then
+				dst[key] = {}
+				snapshot(type(src[key]) == "table" and src[key] or {}, dst[key], val)
+			else
+				dst[key] = src[key]
+			end
+		end
+	end
+	snapshot(M.baseConfig, revertConfig, newConfig)
 
-	if not uglymode then
-		M.baseConfig.general = M.baseConfig.general or {}
-		M.baseConfig.animations = M.baseConfig.animations or {}
-		M.baseConfig.decoration = M.baseConfig.decoration or {}
-		M.baseConfig.decoration.shadow = M.baseConfig.decoration.shadow or {}
-		M.baseConfig.decoration.blur = M.baseConfig.decoration.blur or {}
-		M.baseConfig.group = M.baseConfig.group or {}
-		M.baseConfig.group.groupbar = M.baseConfig.group.groupbar or {}
-		M.baseConfig.render = M.baseConfig.render or {}
-		hl.config({
-			general = {
-				gaps_in = M.baseConfig.general.gaps_in,
-				gaps_out = M.baseConfig.general.gaps_out,
-				border_size = M.baseConfig.general.border_size,
-			},
-			animations = {
-				enabled = M.baseConfig.animations.enabled,
-			},
-			decoration = {
-				shadow = { enabled = M.baseConfig.decoration.shadow.enabled },
-				blur = { enabled = M.baseConfig.decoration.blur.enabled },
-				rounding = M.baseConfig.decoration.rounding,
-			},
-			group = {
-				groupbar = { enabled = M.baseConfig.group.groupbar.enabled },
-			},
-			render = {
-				xp_mode = M.baseConfig.render.xp_mode,
-			},
-		})
+	hl.config(newConfig)
+
+	return function()
+		hl.config(revertConfig)
+	end
+end
+
+local uglymodeRevert = nil
+function M.toggleUglymode()
+	if uglymodeRevert then
+		uglymodeRevert()
+		uglymodeRevert = nil
 		return
 	end
 
-	hl.config({
+	uglymodeRevert = M.withConfig({
 		general = {
 			gaps_in = 0,
 			gaps_out = 0,
