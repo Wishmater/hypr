@@ -21,10 +21,14 @@ vars.setConfig({
 		default_monitor = vars.monitors[1].id,
 		inactive_timeout = 1,
 		hide_on_key_press = true,
-		hide_on_touch = true,
+		zoom_detached_camera = false,
+
+		-- -- This would be coll, but it's annoying in fullscreen apps, especially games
+		-- hotspot_padding = vars.baseConfig.general.gaps_out,
 	},
 
 	misc = {
 		middle_click_paste = false,
+		key_press_enables_dpms = true,
 	},
 })

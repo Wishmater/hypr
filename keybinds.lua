@@ -21,8 +21,7 @@ hl.bind("SUPER + SHIFT + CTRL + F", hl.dsp.exec_cmd("hyprcrsmntr_fullscreen.nu u
 hl.bind("SUPER + G", hl.dsp.window.float(), { description = "Toggle floating" })
 
 -- TILING
-hl.bind("SUPER + code:49", hl.dsp.group.toggle(), { description = "Toggle group" }) -- code:49 = tilde (`)
-hl.bind("SUPER + SHIFT + code:49", hl.dsp.window.toggle_swallow(), { description = "Toggle swallow" }) -- code:49 = tilde (`)
+hl.bind("SUPER + SHIFT + code:49", hl.dsp.group.toggle(), { description = "Toggle group" }) -- code:49 = tilde (`)
 hl.bind("SUPER + SHIFT + Tab", hl.dsp.group.next(), { description = "Change group active" })
 hl.bind("SUPER + F1", hl.dsp.exec_cmd("uglymode_toggle")) -- TODO: 1 fix uglymode
 
@@ -35,7 +34,7 @@ hl.bind("SUPER + H", hl.dsp.focus({ direction = "l" }))
 hl.bind("SUPER + L", hl.dsp.focus({ direction = "r" }))
 hl.bind("SUPER + K", hl.dsp.focus({ direction = "u" }))
 hl.bind("SUPER + J", hl.dsp.focus({ direction = "d" }))
-hl.bind("ALT + code:49", hl.dsp.focus({ urgent_or_last = true }), { description = "Focus urgent or last" }) -- code:49 = tilde (`)
+hl.bind("SUPER + code:49", hl.dsp.focus({ urgent_or_last = true }), { description = "Focus urgent or last" }) -- code:49 = tilde (`)
 hl.bind("ALT + Tab", hl.dsp.window.cycle_next())
 hl.bind("ALT + SHIFT + Tab", hl.dsp.window.cycle_next({ next = false })) -- NOTE: for cycle prev, might need a different dispatch
 

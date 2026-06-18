@@ -1,6 +1,3 @@
--- https://wiki.hyprland.org/Configuring/Basics/Monitors/
-
--- Monitor configs
 hl.monitor({
 	output = vars.monitors[1].id,
 	mode = "1920x1080@180",
@@ -31,26 +28,21 @@ hl.monitor({
 	scale = 1,
 })
 
--- https://wiki.hyprland.org/Configuring/Variables/#misc
 vars.setConfig({
 	misc = {
 		vrr = 2, -- Variable Refresh Rate (Adaptive Sync) -- 2 = only fullscreen
-		render_unfocused_fps = 15, -- default 15 -- does this mean 2nd window videos are capped ?? maybe add some exceptions in window rules, check variable descrip
+		render_unfocused_fps = 15, -- default 15
 	},
-})
 
-vars.setConfig({
 	render = {
 		-- HDR options
 		-- cm_fs_passthrough = 1 -- Passthrough color settings for fullscreen apps when possible. 0 - off, 1 - always, 2 - hdr only
 
 		-- this causes severe visual glitches (parts of the screen going black), especially on fullscreened xwayland apps with popups
-		-- direct_scanout = 1 -- apparently can improve latency for fullscreen windows, but sometimes cause glitches, so if it happens, disable it
+		-- direct_scanout = 1, -- apparently can improve latency for fullscreen windows, but sometimes cause glitches, so if it happens, disable it
 		-- this also apparently requires fullscreen apps to support hdr when it's on or they look over-saturated
 	},
-})
 
-vars.setConfig({
 	quirks = {
 		prefer_hdr = 1,
 	},

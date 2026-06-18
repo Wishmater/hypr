@@ -10,10 +10,15 @@ vars.setConfig({
 		-- TODO: 2 this is annoying specifically with telegram calls while gaming, maybe we can just fix telegram call popup window to open somewhere else, or set this option to ignore new window (0) while gaming
 		on_focus_under_fullscreen = 2, -- unmaximize
 
-		-- TODO: 1 implement a script to open neovide(or anything else) and swallow the current window
-		-- this is really good with neovide, but super annoying everywhere else
-		-- enable_swallow = false,
-		-- swallow_regex = "^(Alacritty|com\\.mitchellh\\.ghostty)$",
+		-- TODO: 3 it would be nice to enable this, if there was a way to exclude ghostty and firefox, or even better, make it re-track
+		-- this is good, but the issue is that with single-process that spawn multiple windows, like firefox or ghostty,
+		-- it causes new windows opened way after the first one to track initial workspace which is very weird
+		initial_workspace_tracking = 0,
+
+		-- this is really good with neovide, but super annoying everywhere else,
+		-- prefer using swallow.nu script that uses groups for a similar effect
+		enable_swallow = false,
+		swallow_regex = "^(Alacritty|com\\.mitchellh\\.ghostty)$",
 	},
 
 	binds = {
@@ -24,7 +29,7 @@ vars.setConfig({
 		-- the mouse is inside the focus window, otherwise there are weird cases where the last focused
 		-- window will be re-focused, and the cursor will be outside of it
 		workspace_center_on = 1,
-		movefocus_cycles_groupfirst = true,
+		movefocus_cycles_groupfirst = false,
 	},
 
 	master = {
@@ -39,7 +44,6 @@ vars.setConfig({
 
 		new_status = "inherit", -- slave
 		new_on_active = "before",
-		new_on_top = true,
 
 		slave_count_for_center_master = 0,
 		-- # this is overall pretty buggy, better to implement with workspace rules
@@ -58,6 +62,7 @@ vars.setConfig({
 		column_width = 0.68359375,
 		explicit_column_widths = "0.333, 0.5, 0.68359375, 1.0",
 		focus_fit_method = 0, -- center
+		-- follow_min_visible = 0,
 	},
 
 	group = {
