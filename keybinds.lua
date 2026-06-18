@@ -36,7 +36,7 @@ hl.bind("SUPER + K", hl.dsp.focus({ direction = "u" }))
 hl.bind("SUPER + J", hl.dsp.focus({ direction = "d" }))
 hl.bind("SUPER + code:49", hl.dsp.focus({ urgent_or_last = true }), { description = "Focus urgent or last" }) -- code:49 = tilde (`)
 hl.bind("ALT + Tab", hl.dsp.window.cycle_next())
-hl.bind("ALT + SHIFT + Tab", hl.dsp.window.cycle_next({ next = false })) -- NOTE: for cycle prev, might need a different dispatch
+hl.bind("ALT + SHIFT + Tab", hl.dsp.window.cycle_next({ next = false }))
 
 -- MOVE WINDOWS
 hl.bind("SUPER + SHIFT + left", hl.dsp.window.move({ direction = "l" }))

@@ -109,19 +109,24 @@ end
 --- the touched keys to their pre-call values from baseConfig.
 --- @param newConfig HL.ConfigOpt
 --- @return fun()
-M.withConfig = function(newConfig)
+M.tempConfig = function(newConfig)
 	local revertConfig = {}
-	local function snapshot(src, dst, partial)
+	local function snapshot(src, dst, partial, path)
 		for key, val in pairs(partial) do
+			local fullPath = path and (path .. ":" .. key) or key
 			if type(val) == "table" then
 				dst[key] = {}
-				snapshot(type(src[key]) == "table" and src[key] or {}, dst[key], val)
+				snapshot(type(src[key]) == "table" and src[key] or {}, dst[key], val, fullPath)
 			else
-				dst[key] = src[key]
+				local current = src[key]
+				if current == nil then
+					current = hl.get_config(fullPath)
+				end
+				dst[key] = current
 			end
 		end
 	end
-	snapshot(M.baseConfig, revertConfig, newConfig)
+	snapshot(M.baseConfig, revertConfig, newConfig, nil)
 
 	hl.config(newConfig)
 
@@ -138,7 +143,7 @@ function M.toggleUglymode()
 		return
 	end
 
-	uglymodeRevert = M.withConfig({
+	uglymodeRevert = M.tempConfig({
 		general = {
 			gaps_in = 0,
 			gaps_out = 0,
