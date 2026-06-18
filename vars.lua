@@ -88,7 +88,6 @@ M.directionForMaster = function(direction)
 	return direction
 end
 
--- Config accumulation
 local function deepMerge(target, source)
 	for key, value in pairs(source) do
 		if type(value) == "table" and type(target[key]) == "table" then
@@ -104,6 +103,66 @@ M.baseConfig = {}
 
 function M.setConfig(tbl)
 	deepMerge(M.baseConfig, tbl)
+end
+
+local uglymode = false
+function M.toggleUglymode()
+	uglymode = not uglymode
+
+	if not uglymode then
+		M.baseConfig.general = M.baseConfig.general or {}
+		M.baseConfig.animations = M.baseConfig.animations or {}
+		M.baseConfig.decoration = M.baseConfig.decoration or {}
+		M.baseConfig.decoration.shadow = M.baseConfig.decoration.shadow or {}
+		M.baseConfig.decoration.blur = M.baseConfig.decoration.blur or {}
+		M.baseConfig.group = M.baseConfig.group or {}
+		M.baseConfig.group.groupbar = M.baseConfig.group.groupbar or {}
+		M.baseConfig.render = M.baseConfig.render or {}
+		hl.config({
+			general = {
+				gaps_in = M.baseConfig.general.gaps_in,
+				gaps_out = M.baseConfig.general.gaps_out,
+				border_size = M.baseConfig.general.border_size,
+			},
+			animations = {
+				enabled = M.baseConfig.animations.enabled,
+			},
+			decoration = {
+				shadow = { enabled = M.baseConfig.decoration.shadow.enabled },
+				blur = { enabled = M.baseConfig.decoration.blur.enabled },
+				rounding = M.baseConfig.decoration.rounding,
+			},
+			group = {
+				groupbar = { enabled = M.baseConfig.group.groupbar.enabled },
+			},
+			render = {
+				xp_mode = M.baseConfig.render.xp_mode,
+			},
+		})
+		return
+	end
+
+	hl.config({
+		general = {
+			gaps_in = 0,
+			gaps_out = 0,
+			border_size = 0,
+		},
+		animations = {
+			enabled = false,
+		},
+		decoration = {
+			shadow = { enabled = false },
+			blur = { enabled = false },
+			rounding = 0,
+		},
+		group = {
+			groupbar = { enabled = false },
+		},
+		render = {
+			xp_mode = true,
+		},
+	})
 end
 
 -- Colors from Kanagawa theme

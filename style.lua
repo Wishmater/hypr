@@ -63,66 +63,89 @@ vars.setConfig({
 	},
 })
 
--- CHANGE: bezier curves are now defined with hl.curve() instead of a single bezier keyword
--- The format changed from "bezier = name,x1,y1,x2,y2" to hl.curve("name", { type = "bezier", points = { {x1,y1}, {x2,y2} } })
-hl.curve("linear", { type = "bezier", points = { { 0, 0 }, { 1, 1 } } })
-hl.curve("almostLinear", { type = "bezier", points = { { 0.5, 0.5 }, { 0.75, 1 } } })
-hl.curve("quick", { type = "bezier", points = { { 0.15, 0 }, { 0.1, 1 } } })
-hl.curve("easeOutQuint", { type = "bezier", points = { { 0.23, 1 }, { 0.32, 1 } } })
+-- hl.curve("linear", { type = "bezier", points = { { 0, 0 }, { 1, 1 } } })
+-- hl.curve("almostLinear", { type = "bezier", points = { { 0.5, 0.5 }, { 0.75, 1 } } })
+-- hl.curve("quick", { type = "bezier", points = { { 0.15, 0 }, { 0.1, 1 } } })
+-- hl.curve("easeOut", { type = "bezier", points = { { 0.23, 1 }, { 0.32, 1 } } })
+hl.curve("quick", { type = "spring", mass = 1, stiffness = 2000, dampening = 80 }) -- no bounce, complete fast
+hl.curve("normal", { type = "spring", mass = 1, stiffness = 1500, dampening = 70 }) -- a tiny bit bouncy (could be 67 dampening to make it bouncier)
+hl.curve("flashy", { type = "spring", mass = 1, stiffness = 1500, dampening = 80 }) -- no bounce, long ease-out
 
--- CHANGE: animation definitions changed from "animation = leaf, enabled, speed, curve, [style]"
--- to hl.animation({ leaf = "...", enabled = true, speed = N, bezier|spring = "...", style = "..." })
--- The speed values may need recalibration for 0.55 — these are the originals.
-hl.animation({ leaf = "global", enabled = true, speed = 5, bezier = "default" })
-hl.animation({ leaf = "windows", enabled = true, speed = 3, bezier = "easeOutQuint" })
-hl.animation({ leaf = "windowsIn", enabled = true, speed = 3, bezier = "easeOutQuint", style = "popin 87%" })
-hl.animation({ leaf = "windowsOut", enabled = true, speed = 1, bezier = "almostLinear", style = "popin 87%" })
-hl.animation({ leaf = "windowsMove", enabled = true, speed = 2, bezier = "easeOutQuint" })
-hl.animation({ leaf = "layers", enabled = true, speed = 3, bezier = "easeOutQuint" })
-hl.animation({ leaf = "layersIn", enabled = true, speed = 3, bezier = "easeOutQuint", style = "fade" })
-hl.animation({ leaf = "layersOut", enabled = true, speed = 1, bezier = "almostLinear", style = "fade" })
-hl.animation({ leaf = "fade", enabled = true, speed = 2, bezier = "quick" })
-hl.animation({ leaf = "fadeIn", enabled = true, speed = 2, bezier = "quick" })
-hl.animation({ leaf = "fadeOut", enabled = true, speed = 1, bezier = "almostLinear" })
--- fadeSwitch
--- fadeShadows
--- fadeDim
--- fadeLayers
-hl.animation({ leaf = "fadeLayersIn", enabled = true, speed = 2, bezier = "quick" })
-hl.animation({ leaf = "fadeLayersOut", enabled = true, speed = 1, bezier = "almostLinear" })
--- fadePopups
--- fadePopupsIn
--- fadePopupsOut
-hl.animation({ leaf = "border", enabled = true, speed = 4, bezier = "easeOutQuint" })
-hl.animation({ leaf = "borderangle", enabled = false, speed = 0 }) -- speed = 0 disables
-hl.animation({ leaf = "workspaces", enabled = true, speed = 2, bezier = "almostLinear", style = "fade" })
-hl.animation({
-	leaf = "workspacesIn",
-	enabled = true,
-	speed = 1.5,
-	bezier = "easeOutQuint",
-	style = "slidefadevert 33%",
-})
-hl.animation({
-	leaf = "workspacesOut",
-	enabled = true,
-	speed = 1.5,
-	bezier = "easeOutQuint",
-	style = "slidefadevert 33%",
-})
-hl.animation({ leaf = "specialWorkspace", enabled = true, speed = 1.5, bezier = "quick", style = "slidefadevert" })
-hl.animation({
-	leaf = "specialWorkspaceIn",
-	enabled = true,
-	speed = 1.5,
-	bezier = "quick",
-	style = "slidefadevert 33%",
-})
-hl.animation({
-	leaf = "specialWorkspaceOut",
-	enabled = true,
-	speed = 1.2,
-	bezier = "almostLinear",
-	style = "slidefadevert 66%",
-})
-hl.animation({ leaf = "zoomFactor", enabled = true, speed = 0.8, bezier = "almostLinear" })
+hl.animation({ leaf = "global", enabled = true, speed = 3, spring = "normal" })
+do
+	hl.animation({ leaf = "windows", enabled = true, speed = 3, spring = "normal" })
+	do
+		hl.animation({ leaf = "windowsIn", enabled = true, speed = 3, spring = "flashy", style = "popin 87%" })
+		hl.animation({ leaf = "windowsOut", enabled = true, speed = 1, spring = "quick", style = "popin 87%" })
+		hl.animation({ leaf = "windowsMove", enabled = true, speed = 2, spring = "normal" })
+	end
+	hl.animation({ leaf = "layers", enabled = true, speed = 3, spring = "normal" })
+	do
+		hl.animation({ leaf = "layersIn", enabled = true, speed = 3, spring = "flashy", style = "fade" })
+		hl.animation({ leaf = "layersOut", enabled = true, speed = 1, spring = "quick", style = "fade" })
+	end
+	hl.animation({ leaf = "fade", enabled = true, speed = 2, spring = "quick" })
+	do
+		hl.animation({ leaf = "fadeIn", enabled = true, speed = 2, spring = "quick" })
+		hl.animation({ leaf = "fadeOut", enabled = true, speed = 1, spring = "quick" })
+		hl.animation({ leaf = "fadeSwitch", enabled = true, speed = 5, spring = "flashy" })
+		hl.animation({ leaf = "fadeShadow", enabled = true, speed = 5, spring = "flashy" })
+		hl.animation({ leaf = "fadeDim", enabled = true, speed = 5, spring = "flashy" })
+		hl.animation({ leaf = "fadeLayers", enabled = true, speed = 2, spring = "normal" })
+		do
+			hl.animation({ leaf = "fadeLayersIn", enabled = true, speed = 3, spring = "flashy" })
+			hl.animation({ leaf = "fadeLayersOut", enabled = true, speed = 1, spring = "quick" })
+		end
+		hl.animation({ leaf = "fadePopups", enabled = true, speed = 2, spring = "quick" })
+		do
+			hl.animation({ leaf = "fadePopupsIn", enabled = true, speed = 2, spring = "quick" })
+			hl.animation({ leaf = "fadePopupsOut", enabled = true, speed = 1, spring = "quick" })
+		end
+		hl.animation({ leaf = "fadeDpms", enabled = true, speed = 5, spring = "flashy" })
+	end
+	hl.animation({ leaf = "border", enabled = true, speed = 5, spring = "flashy" })
+	hl.animation({ leaf = "borderangle", enabled = false })
+	-- hl.animation({ leaf = "shadowangle", enabled = false })
+	hl.animation({ leaf = "workspaces", enabled = true, speed = 3, spring = "normal", style = "fade" })
+	do
+		hl.animation({
+			leaf = "workspacesIn",
+			enabled = true,
+			speed = 1.5,
+			spring = "quick",
+			style = "slidefadevert 16%",
+		})
+		hl.animation({
+			leaf = "workspacesOut",
+			enabled = true,
+			speed = 1.5,
+			spring = "quick",
+			style = "fade",
+		})
+		hl.animation({
+			leaf = "specialWorkspace",
+			enabled = true,
+			speed = 1.5,
+			spring = "normal",
+			style = "fade",
+		})
+		do
+			hl.animation({
+				leaf = "specialWorkspaceIn",
+				enabled = true,
+				speed = 1.5,
+				spring = "normal",
+				style = "slidefadevert 33%",
+			})
+			hl.animation({
+				leaf = "specialWorkspaceOut",
+				enabled = true,
+				speed = 1.2,
+				spring = "quick",
+				style = "slidefadevert 66%",
+			})
+		end
+	end
+	hl.animation({ leaf = "zoomFactor", enabled = true, speed = 0.8, spring = "quick" })
+	hl.animation({ leaf = "monitorAdded", enabled = true, speed = 5, spring = "flashy" })
+end

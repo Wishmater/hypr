@@ -23,7 +23,7 @@ hl.bind("SUPER + G", hl.dsp.window.float(), { description = "Toggle floating" })
 -- TILING
 hl.bind("SUPER + SHIFT + code:49", hl.dsp.group.toggle(), { description = "Toggle group" }) -- code:49 = tilde (`)
 hl.bind("SUPER + SHIFT + Tab", hl.dsp.group.next(), { description = "Change group active" })
-hl.bind("SUPER + F1", hl.dsp.exec_cmd("uglymode_toggle")) -- TODO: 1 fix uglymode
+hl.bind("SUPER + F1", vars.toggleUglymode)
 
 -- MOVE FOCUS
 hl.bind("SUPER + left", hl.dsp.focus({ direction = "l" }))
