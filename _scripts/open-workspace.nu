@@ -66,8 +66,10 @@ def open-ghostty [
     if not $dry_run {
         job spawn {
             if ($swallow) {
-                swallow.nu $"($ghostty_cmd)"
+                log debug $"    Ghostty exec: swallow.nu ($ghostty_cmd)"
+                swallow.nu $ghostty_cmd
             } else {
+                log debug $"    Ghostty exec: bash -c ($ghostty_cmd)"
                 bash -c $ghostty_cmd
             }
         }
@@ -86,7 +88,7 @@ def wait-for-window [title: string] {
     for $i in 0..30 {
         let clients = (^hyprctl clients -j | from json)
         if ($clients | where title == $title | length) > 0 {
-            sleep 100ms
+            sleep 200ms
             return
         }
         sleep 100ms
@@ -98,10 +100,11 @@ def wait-for-window [title: string] {
 def send-text-to-window [title: string, text: string, add_enter?: bool = false] {
     let chars = $text | split chars
     for char in $chars {
+        sleep 8ms
         let key = if $char == " " { "space" } else { $char }
         log debug $"    Hyprland cmd: hyprctl dispatch \"hl.dsp.send_shortcut\({ mods = '', key = '($key)', window = 'title:($title)' })\""
         ^hyprctl dispatch $"hl.dsp.send_shortcut\({ mods = '', key = '($key)', window = 'title:($title)' })" out> (null-device)
-        sleep 10ms
+        sleep 8ms
     }
 
     if ($add_enter) {

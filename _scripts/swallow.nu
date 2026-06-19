@@ -11,7 +11,13 @@ use std/log
 #
 # This avoids Hyprland's PID-based swallow mechanism, which is unreliable
 # with single-instance terminals (ghostty) where all windows share a PID.
-def main [command: string, ...args: string] {
+def --wrapped main [...rawArgs: string] {
+    if ($rawArgs | length) == 0 {
+        log error "usage: swallow <command> [args...]"
+        return
+    }
+    let command = $rawArgs.0
+    let args = ($rawArgs | slice 1..)
     # snapshot auto_group so we can restore it after
     let autoGroupOption = (^hyprctl getoption group:auto_group -j | from json)
     let autoGroupWas = if ($autoGroupOption | columns | "int" in $in) {
