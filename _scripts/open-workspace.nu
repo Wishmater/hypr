@@ -30,6 +30,7 @@ def main [--dry-run (-n), --dir (-d): string] {
     let editor_cmd = "neovide"
     log info "Opening editor in new window..."
     if not $dry_run {
+        sleep 1000ms # TODO: 1 hack to prevent swallow from swallowing the other windows
         open-ghostty $"($basename)-editor" $start_dir $dry_run $editor_cmd true true
     }
 
@@ -60,15 +61,21 @@ def open-ghostty [
     adter_cmd_enter?: bool = false,
     swallow?: bool = false,
 ] {
-    let ghostty_cmd = $"ghostty --title=($pane_name) --gtk-single-instance=false --working-directory=($dir_path | path expand)"
-    log debug $"    Ghostty cmd: ($ghostty_cmd)"
+    let ghostty_args = [
+        "ghostty"
+        $"--title=($pane_name)"
+        "--gtk-single-instance=false"
+        $"--working-directory=($dir_path | path expand)"
+    ]
+    log debug $"    Ghostty cmd: ($ghostty_args | str join ' ')"
 
     if not $dry_run {
         job spawn {
             if ($swallow) {
-                log debug $"    Ghostty exec: swallow.nu ($ghostty_cmd)"
-                swallow.nu $ghostty_cmd
+                log debug $"    Ghostty exec: swallow.nu ($ghostty_args | str join ' ')"
+                swallow.nu ...$ghostty_args
             } else {
+                let ghostty_cmd = ($ghostty_args | str join ' ')
                 log debug $"    Ghostty exec: bash -c ($ghostty_cmd)"
                 bash -c $ghostty_cmd
             }
