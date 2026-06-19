@@ -7,6 +7,30 @@ vars.setConfig({
 	},
 })
 
+-- --- Per layout bindings
+-- local function layout_bind(bind_table)
+-- 	return function()
+-- 		local workspace = hl.get_active_special_workspace() or hl.get_active_workspace()
+--
+-- 		if not workspace then
+-- 			return
+-- 		end
+--
+-- 		local layout = workspace.tiled_layout
+--
+-- 		if bind_table[layout] then
+-- 			hl.dispatch(bind_table[layout])
+-- 		end
+-- 	end
+-- end
+-- -- EXAMPLE:
+-- hl.bind("SUPER + A", layout_bind({
+--     scrolling = hl.dsp.layout("swapcol l"),  -- Scrolling: swap column with left one
+--     dwindle   = hl.dsp.layout("swapsplit"),  -- Dwindle: swap window split
+--     monocle   = hl.dsp.layout("cycleprev"),  -- Monocle and master: cycle prev window
+--     master    = hl.dsp.layout("cycleprev"),
+-- }))
+
 -- WINDOW
 hl.bind("SUPER + S", hl.dsp.window.close(), { description = "Close active window" })
 hl.bind("SUPER + SHIFT + CTRL + S", hl.dsp.window.kill(), { description = "Kill active window" })
@@ -51,46 +75,25 @@ hl.bind("SUPER + SHIFT + J", hl.dsp.window.move({ direction = "d" }))
 -- RESIZE WINDOWS
 -- Hack to enable animations for manual resizing with keyboard but not with mouse
 -- TODO: 1 animate_manual_resizes doesn't work in tiled (at least in master), it does work floating
-hl.bind("SUPER + CTRL + left", function()
-	hl.config({ misc = { animate_manual_resizes = true } })
-	hl.dispatch(hl.dsp.window.resize({ x = vars.resizeAmount * -1, y = 0, relative = true }))
-	hl.config({ misc = { animate_manual_resizes = false } })
-end, { repeating = true })
-hl.bind("SUPER + CTRL + right", function()
-	hl.config({ misc = { animate_manual_resizes = true } })
-	hl.dispatch(hl.dsp.window.resize({ x = vars.resizeAmount, y = 0, relative = true }))
-	hl.config({ misc = { animate_manual_resizes = false } })
-end, { repeating = true })
-hl.bind("SUPER + CTRL + up", function()
-	hl.config({ misc = { animate_manual_resizes = true } })
-	hl.dispatch(hl.dsp.window.resize({ x = 0, y = vars.resizeAmount, relative = true }))
-	hl.config({ misc = { animate_manual_resizes = false } })
-end, { repeating = true })
-hl.bind("SUPER + CTRL + down", function()
-	hl.config({ misc = { animate_manual_resizes = true } })
-	hl.dispatch(hl.dsp.window.resize({ x = 0, y = vars.resizeAmount * -1, relative = true }))
-	hl.config({ misc = { animate_manual_resizes = false } })
-end, { repeating = true })
-hl.bind("SUPER + CTRL + H", function()
-	hl.config({ misc = { animate_manual_resizes = true } })
-	hl.dispatch(hl.dsp.window.resize({ x = vars.resizeAmount * -1, y = 0, relative = true }))
-	hl.config({ misc = { animate_manual_resizes = false } })
-end, { repeating = true })
-hl.bind("SUPER + CTRL + L", function()
-	hl.config({ misc = { animate_manual_resizes = true } })
-	hl.dispatch(hl.dsp.window.resize({ x = vars.resizeAmount, y = 0, relative = true }))
-	hl.config({ misc = { animate_manual_resizes = false } })
-end, { repeating = true })
-hl.bind("SUPER + CTRL + K", function()
-	hl.config({ misc = { animate_manual_resizes = true } })
-	hl.dispatch(hl.dsp.window.resize({ x = 0, y = vars.resizeAmount, relative = true }))
-	hl.config({ misc = { animate_manual_resizes = false } })
-end, { repeating = true })
-hl.bind("SUPER + CTRL + J", function()
-	hl.config({ misc = { animate_manual_resizes = true } })
-	hl.dispatch(hl.dsp.window.resize({ x = 0, y = vars.resizeAmount * -1, relative = true }))
-	hl.config({ misc = { animate_manual_resizes = false } })
-end, { repeating = true })
+local function resizeAnim(xDelta, yDelta)
+	local revert = vars.tempConfig({ misc = { animate_manual_resizes = true } })
+	-- hl.exec_scheduled_prop_refresh_immediately()
+	hl.dispatch(hl.dsp.window.resize({ x = xDelta, y = yDelta, relative = true }))
+	revert()
+end
+local function resizeAnimFunc(xDelta, yDelta)
+	return function()
+		resizeAnim(xDelta, yDelta)
+	end
+end
+hl.bind("SUPER + CTRL + left", resizeAnimFunc(vars.resizeAmount * -1, 0), { repeating = true })
+hl.bind("SUPER + CTRL + right", resizeAnimFunc(vars.resizeAmount, 0), { repeating = true })
+hl.bind("SUPER + CTRL + up", resizeAnimFunc(0, vars.resizeAmount), { repeating = true })
+hl.bind("SUPER + CTRL + down", resizeAnimFunc(0, vars.resizeAmount * -1), { repeating = true })
+hl.bind("SUPER + CTRL + H", resizeAnimFunc(vars.resizeAmount * -1, 0), { repeating = true })
+hl.bind("SUPER + CTRL + L", resizeAnimFunc(vars.resizeAmount, 0), { repeating = true })
+hl.bind("SUPER + CTRL + K", resizeAnimFunc(0, vars.resizeAmount), { repeating = true })
+hl.bind("SUPER + CTRL + J", resizeAnimFunc(0, vars.resizeAmount * -1), { repeating = true })
 
 -- APPS
 -- bind = SUPER, Tab, exec, wayxec --normal-window

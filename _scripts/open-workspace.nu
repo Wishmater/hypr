@@ -30,7 +30,7 @@ def main [--dry-run (-n), --dir (-d): string] {
     let editor_cmd = "neovide"
     log info "Opening editor in new window..."
     if not $dry_run {
-        open-ghostty $"($basename)-editor" $start_dir $dry_run $editor_cmd true
+        open-ghostty $"($basename)-editor" $start_dir $dry_run $editor_cmd true true
     }
 
     print "Press any key to continue (this will close all opened windows)..."
@@ -58,13 +58,18 @@ def open-ghostty [
     dry_run?: bool = false,
     after_cmd?: string,
     adter_cmd_enter?: bool = false,
+    swallow?: bool = false,
 ] {
     let ghostty_cmd = $"ghostty --title=($pane_name) --gtk-single-instance=false --working-directory=($dir_path | path expand)"
     log debug $"    Ghostty cmd: ($ghostty_cmd)"
 
     if not $dry_run {
         job spawn {
-            bash -c $ghostty_cmd
+            if ($swallow) {
+                swallow.nu $"($ghostty_cmd)"
+            } else {
+                bash -c $ghostty_cmd
+            }
         }
         job spawn {
             wait-for-window $pane_name
@@ -81,7 +86,7 @@ def wait-for-window [title: string] {
     for $i in 0..30 {
         let clients = (^hyprctl clients -j | from json)
         if ($clients | where title == $title | length) > 0 {
-            sleep 200ms
+            sleep 100ms
             return
         }
         sleep 100ms
@@ -94,13 +99,13 @@ def send-text-to-window [title: string, text: string, add_enter?: bool = false] 
     let chars = $text | split chars
     for char in $chars {
         let key = if $char == " " { "space" } else { $char }
-        log debug $"    Hyprland cmd: hyprctl dispatch hl.dsp.send_shortcut\({ key = \"($key)\", window = { title = \"($title)\" } })"
-        ^hyprctl dispatch $"hl.dsp.send_shortcut\({ key = \"($key)\", window = {{ title = \"($title)\" } })" out> (null-device)
-        sleep 30ms
+        log debug $"    Hyprland cmd: hyprctl dispatch \"hl.dsp.send_shortcut\({ mods = '', key = '($key)', window = 'title:($title)' })\""
+        ^hyprctl dispatch $"hl.dsp.send_shortcut\({ mods = '', key = '($key)', window = 'title:($title)' })" out> (null-device)
+        sleep 10ms
     }
 
     if ($add_enter) {
-        log debug $"    Hyprland cmd: hyprctl dispatch hl.dsp.send_shortcut\({ key = \"Return\", window = {{ title = \"($title)\" } })"
-        ^hyprctl dispatch $"hl.dsp.send_shortcut\({ key = \"Return\", window = {{ title = \"($title)\" } })" out> (null-device)
+        log debug $"    Hyprland cmd: hyprctl dispatch \"hl.dsp.send_shortcut\({ mods = '', key = 'Return', window = 'title:($title)' })\""
+        ^hyprctl dispatch $"hl.dsp.send_shortcut\({ mods = '', key = 'Return', window = 'title:($title)' })" out> (null-device)
     }
 }

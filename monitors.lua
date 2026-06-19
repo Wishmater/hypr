@@ -35,6 +35,8 @@ vars.setConfig({
 	},
 
 	render = {
+		keep_unmodified_copy = 2, -- default 2, only hdr
+
 		-- HDR options
 		-- cm_fs_passthrough = 1 -- Passthrough color settings for fullscreen apps when possible. 0 - off, 1 - always, 2 - hdr only
 

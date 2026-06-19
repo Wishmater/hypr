@@ -138,11 +138,21 @@ end
 local uglymodeRevert = nil
 function M.toggleUglymode()
 	if uglymodeRevert then
+		hl.notification.create({
+			text = "Uglymode off",
+			timeout = 3000,
+			color = M.colors.dragonBlue2,
+		})
 		uglymodeRevert()
 		uglymodeRevert = nil
 		return
 	end
 
+	hl.notification.create({
+		text = "Uglymode on",
+		timeout = 3000,
+		color = M.colors.dragonBlue2,
+	})
 	uglymodeRevert = M.tempConfig({
 		general = {
 			gaps_in = 0,
