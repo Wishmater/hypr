@@ -38,10 +38,10 @@ hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("waywingctl dismiss_notifications")
 hl.bind("SUPER + A", hl.dsp.window.tag({ tag = "crsmntr_pinned" }))
 hl.bind("SUPER + SHIFT + A", hl.dsp.window.float({ action = "on" }))
 hl.bind("SUPER + SHIFT + A", hl.dsp.window.pin())
-hl.bind("SUPER + F", hl.dsp.exec_cmd("hyprcrsmntr_fullscreen.nu"))
-hl.bind("SUPER + SHIFT + F", hl.dsp.exec_cmd("hyprcrsmntr_fullscreen.nu --internal"))
+hl.bind("SUPER + F", hl.dsp.exec_cmd("hyprcrsmntr_fullscreen"))
+hl.bind("SUPER + SHIFT + F", hl.dsp.exec_cmd("hyprcrsmntr_fullscreen --internal"))
 hl.bind("SUPER + SHIFT + CTRL + F", hl.dsp.window.tag({ tag = "reverse_client_fullscreen" }))
-hl.bind("SUPER + SHIFT + CTRL + F", hl.dsp.exec_cmd("hyprcrsmntr_fullscreen.nu update"))
+hl.bind("SUPER + SHIFT + CTRL + F", hl.dsp.exec_cmd("hyprcrsmntr_fullscreen update"))
 hl.bind("SUPER + G", hl.dsp.window.float(), { description = "Toggle floating" })
 
 -- TILING

@@ -16,7 +16,7 @@ vars.setConfig({
 		initial_workspace_tracking = 0,
 
 		-- this is really good with neovide, but super annoying everywhere else,
-		-- prefer using swallow.nu script that uses groups for a similar effect
+		-- prefer using swallow script that uses groups for a similar effect
 		enable_swallow = false,
 		swallow_regex = "^(Alacritty|com\\.mitchellh\\.ghostty)$",
 	},
@@ -59,8 +59,9 @@ vars.setConfig({
 
 	scrolling = {
 		fullscreen_on_one_column = false,
-		column_width = 0.68359375,
-		explicit_column_widths = "0.333, 0.5, 0.68359375, 1.0",
+		-- column_width = 0.68359375,
+		column_width = 0.3140625, -- TODO: 3 we should use this for vertical monitors and the other for horizontal. Not possible to make the distinction right now.
+		explicit_column_widths = "0.3140625, 0.5, 0.68359375, 1.0",
 		focus_fit_method = 0, -- center
 		-- follow_min_visible = 0,
 	},

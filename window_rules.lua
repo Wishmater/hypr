@@ -137,6 +137,13 @@ hl.window_rule({
 	tag = "-popup",
 	match = { class = "^Patchance.*" },
 })
+-- Fix issues with Godot, similar to steam client
+hl.window_rule({
+	name = "tag-remove-popup-godot",
+	tag = "-popup",
+	match = { class = "^Godot.*" },
+})
+
 -- Kamera fix to make it float above everything
 hl.window_rule({
 	name = "tag-remove-popup-kamera",

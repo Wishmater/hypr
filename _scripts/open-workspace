@@ -72,8 +72,8 @@ def open-ghostty [
     if not $dry_run {
         job spawn {
             if ($swallow) {
-                log debug $"    Ghostty exec: swallow.nu ($ghostty_args | str join ' ')"
-                swallow.nu ...$ghostty_args
+                log debug $"    Ghostty exec: swallow ($ghostty_args | str join ' ')"
+                swallow ...$ghostty_args
             } else {
                 let ghostty_cmd = ($ghostty_args | str join ' ')
                 log debug $"    Ghostty exec: bash -c ($ghostty_cmd)"
