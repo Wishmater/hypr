@@ -1,69 +1,58 @@
-#!/usr/bin/env bash
+#!/usr/bin/env nu
 
-# Simple script to temporarily isolate a Wayland output
-# Usage: ./isolate-output.sh [output-name]
+use std/log
+use std null-device
 
-set -e
+def main [output?: string] {
+    let target = if ($output | is-empty) {
+        (^hyprctl activeworkspace -j | from json).monitor
+    } else {
+        $output
+    }
 
-# Default to current active output if none provided
-if [ $# -eq 0 ]; then
-  TARGET_OUTPUT=$(hyprctl activeworkspace -j | jq -r '.monitor')
-elif [ $# -ne 1 ]; then
-  echo "Usage: $0 [output-name]"
-  echo "Defaults to current active monitor if not provided"
-  echo "Available outputs:"
-  hyprctl monitors | grep -E "^Monitor" | cut -d' ' -f2
-  exit 1
-else
-  TARGET_OUTPUT="$1"
-fi
+    let names = (^hyprctl monitors -j | from json | get name)
 
-# Verify target output exists
-if ! hyprctl monitors -j | jq -r '.[].name' | grep -q "^$TARGET_OUTPUT$"; then
-  echo "Error: Output '$TARGET_OUTPUT' not found."
-  exit 1
-fi
+    if $target not-in $names {
+        log error $"Output '($target)' not found."
+        log info $"Available: ($names | str join ' ')"
+        exit 1
+    }
 
-echo "Isolating output: $TARGET_OUTPUT"
+    if ($names | length) <= 1 {
+        log info "Only one monitor connected -- nothing to isolate."
+        exit 0
+    }
 
-# Store workspace to monitor mapping
-declare -A ws_map
-while IFS=' ' read -r id mon; do
-  ws_map["$id"]="$mon"
-done < <(hyprctl workspaces -j | jq -r '.[] | "\(.id) \(.monitor)"')
+    let keyDpmsOpt = (^hyprctl getoption misc:key_press_enables_dpms -j | from json)
+    let mouseDpmsOpt = (^hyprctl getoption misc:mouse_move_enables_dpms -j | from json)
+    let keyDpmsWas = if "int" in ($keyDpmsOpt | columns) { $keyDpmsOpt.int != 0 } else { $keyDpmsOpt.bool }
+    let mouseDpmsWas = if "int" in ($mouseDpmsOpt | columns) { $mouseDpmsOpt.int != 0 } else { $mouseDpmsOpt.bool }
 
-# Get all outputs and turn off DPMS for all except target
-hyprctl monitors -j | jq -r '.[].name' | while read output; do
-  if [ "$output" = "$TARGET_OUTPUT" ]; then
-    echo "Keeping $output enabled"
-  else
-    echo "Turning off $output"
-    # hyprctl dispatch dpms off "$output"
-    hyprctl keyword monitor "$output",disable
-  fi
-done
+    ^hyprctl eval "hl.config({ misc = { key_press_enables_dpms = false, mouse_move_enables_dpms = false } })" out> (null-device)
 
-echo ""
-echo "Output '$TARGET_OUTPUT' is now isolated."
-echo "Press Ctrl+C to restore all outputs..."
+    log info $"Isolating output: ($target)"
 
-# Restore function
-restore() {
-  echo -e "\nRestoring all outputs..."
-  # # Re-enable all monitors and DPMS
-  # hyprctl monitors -j | jq -r '.[].name' | while read output; do
-  #   hyprctl dispatch dpms on "$output"
-  # done
-  hyprctl reload
-  # Restore workspaces to original monitors
-  for id in "${!ws_map[@]}"; do
-    hyprctl dispatch moveworkspace "$id","${ws_map[$id]}"
-  done
-  exit 0
+    for mon in $names {
+        if $mon != $target {
+            log info $"  DPMS off: ($mon)"
+            ^hyprctl dispatch ("hl.dsp.dpms({ action = 'off', monitor = '" + $mon + "' })") out> (null-device)
+        }
+    }
+
+    log info $"Output '($target)' is now isolated."
+    print "Press Enter to restore all outputs..."
+    input
+
+    log info "Restoring all outputs..."
+
+    ^hyprctl eval ("hl.config({ misc = { key_press_enables_dpms = " + (if $keyDpmsWas { "true" } else { "false" }) + ", mouse_move_enables_dpms = " + (if $mouseDpmsWas { "true" } else { "false" }) + " } })") out> (null-device)
+
+    for mon in $names {
+        if $mon != $target {
+            log info $"  DPMS on: ($mon)"
+            ^hyprctl dispatch ("hl.dsp.dpms({ action = 'on', monitor = '" + $mon + "' })") out> (null-device)
+        }
+    }
+
+    log info "Done."
 }
-
-trap restore SIGINT SIGTERM
-
-while true; do
-  sleep 1
-done
