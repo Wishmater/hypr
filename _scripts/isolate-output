@@ -23,19 +23,12 @@ def main [output?: string] {
         exit 0
     }
 
-    let keyDpmsOpt = (^hyprctl getoption misc:key_press_enables_dpms -j | from json)
-    let mouseDpmsOpt = (^hyprctl getoption misc:mouse_move_enables_dpms -j | from json)
-    let keyDpmsWas = if "int" in ($keyDpmsOpt | columns) { $keyDpmsOpt.int != 0 } else { $keyDpmsOpt.bool }
-    let mouseDpmsWas = if "int" in ($mouseDpmsOpt | columns) { $mouseDpmsOpt.int != 0 } else { $mouseDpmsOpt.bool }
-
-    ^hyprctl eval "hl.config({ misc = { key_press_enables_dpms = false, mouse_move_enables_dpms = false } })" out> (null-device)
-
     log info $"Isolating output: ($target)"
 
     for mon in $names {
         if $mon != $target {
-            log info $"  DPMS off: ($mon)"
-            ^hyprctl dispatch ("hl.dsp.dpms({ action = 'off', monitor = '" + $mon + "' })") out> (null-device)
+            log info $"  Disabling ($mon)"
+            ^hyprctl eval ("hl.monitor({ output = '" + $mon + "', disabled = true })") out> (null-device)
         }
     }
 
@@ -45,12 +38,10 @@ def main [output?: string] {
 
     log info "Restoring all outputs..."
 
-    ^hyprctl eval ("hl.config({ misc = { key_press_enables_dpms = " + (if $keyDpmsWas { "true" } else { "false" }) + ", mouse_move_enables_dpms = " + (if $mouseDpmsWas { "true" } else { "false" }) + " } })") out> (null-device)
-
     for mon in $names {
         if $mon != $target {
-            log info $"  DPMS on: ($mon)"
-            ^hyprctl dispatch ("hl.dsp.dpms({ action = 'on', monitor = '" + $mon + "' })") out> (null-device)
+            log info $"  Enabling ($mon)"
+            ^hyprctl eval ("hl.monitor({ output = '" + $mon + "', disabled = false })") out> (null-device)
         }
     }
 
