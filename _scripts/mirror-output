@@ -1,107 +1,63 @@
-#!/usr/bin/env bash
+#!/usr/bin/env nu
 
-# Script to mirror a Wayland output to all other outputs using wl-mirror and Hyprland
-# Usage: ./mirror-output.sh <output_to_mirror>
+use std/log
+use std null-device
 
-if [ $# -eq 0 ]; then
-  TARGET_OUTPUT=$(hyprctl activeworkspace -j | jq -r '.monitor')
-elif [ $# -ne 1 ]; then
-  echo "Usage: $0 [output_to_mirror]"
-  echo "Defaults to current active monitor if not provided"
-  echo "Available outputs:"
-  hyprctl monitors | grep -E "^Monitor" | cut -d' ' -f2
-  exit 1
-else
-  TARGET_OUTPUT="$1"
-fi
+def main [output_to_mirror?: string] {
+    let target = if ($output_to_mirror | is-empty) {
+        (^hyprctl activeworkspace -j | from json).monitor
+    } else {
+        $output_to_mirror
+    }
 
-# Get all outputs from Hyprland
-ALL_OUTPUTS=$(hyprctl monitors -j | jq -r '.[].name')
+    let allNames = (^hyprctl monitors -j | from json | get name)
 
-if [ -z "$ALL_OUTPUTS" ]; then
-  echo "Error: Could not get outputs from Hyprland"
-  exit 1
-fi
+    if $target not-in $allNames {
+        log error $"Output '($target)' not found."
+        log info $"Available: ($allNames | str join ' ')"
+        exit 1
+    }
 
-# Check if target output exists
-if ! echo "$ALL_OUTPUTS" | grep -q "^$TARGET_OUTPUT$"; then
-  echo "Error: Output '$TARGET_OUTPUT' not found. Available outputs:"
-  echo "$ALL_OUTPUTS"
-  exit 1
-fi
+    if ($allNames | length) <= 1 {
+        log info "Only one monitor connected -- nothing to mirror."
+        exit 0
+    }
 
-echo "Mirroring output: $TARGET_OUTPUT"
-echo "Available outputs: $ALL_OUTPUTS"
+    log info $"Mirroring output: ($target)"
 
-# Counter for window identification
-COUNTER=0
+    for output in $allNames {
+        if $output != $target {
+            log info $"  Creating mirror on: ($output)"
 
-# Create mirror windows for each output except the target
-for OUTPUT in $ALL_OUTPUTS; do
-  if [ "$OUTPUT" != "$TARGET_OUTPUT" ]; then
-    echo "Creating mirror on output: $OUTPUT"
+            ^hyprctl dispatch ("hl.dsp.focus({ monitor = '" + $output + "' })") out> (null-device)
 
-    # Start wl-mirror in background
-    hyprctl dispatch focusmonitor $OUTPUT
-    wl-mirror -s c "$TARGET_OUTPUT" &
-    MIRROR_PID=$!
+            job spawn { ^wl-mirror -s c $target }
 
-    # Store PID and output for later reference
-    MIRROR_PIDS[$COUNTER]=$MIRROR_PID
-    MIRROR_OUTPUTS[$COUNTER]=$OUTPUT
+            sleep 200ms
 
-    # Give wl-mirror a moment to create the window
-    sleep 0.2
+            let mirrorWindows = (^hyprctl clients -j | from json | where class == "at.yrlf.wl_mirror")
 
-    # Get the window address (you might need to adjust this based on your window manager)
-    # This tries to find the most recently created wl-mirror window
-    WINDOW_ADDRESS=$(hyprctl clients -j | jq -r ".[] | select(.class == \"at.yrlf.wl_mirror\") | .address" | tail -n1)
+            if ($mirrorWindows | length) > 0 {
+                let address = ($mirrorWindows | last).address
+                log info $"    window: ($address)"
 
-    if [ -n "$WINDOW_ADDRESS" ]; then
-      echo "Moving wl-mirror window $WINDOW_ADDRESS to output $OUTPUT"
+                ^hyprctl dispatch ("hl.dsp.focus({ window = 'address:" + $address + "' })") out> (null-device)
+                ^hyprctl dispatch ("hl.dsp.window.tag({ tag = 'crsmntr_pinned', window = 'address:" + $address + "' })") out> (null-device)
+                ^hyprctl dispatch ("hl.dsp.focus({ window = 'address:" + $address + "' })") out> (null-device)
+                ^hyprctl dispatch ("hl.dsp.window.move({ monitor = '" + $output + "', window = 'address:" + $address + "' })") out> (null-device)
+                ^hyprctl dispatch ("hl.dsp.focus({ window = 'address:" + $address + "' })") out> (null-device)
+                ^hyprctl dispatch ("hl.dsp.window.fullscreen({ action = 'set', window = 'address:" + $address + "' })") out> (null-device)
+                ^hyprctl dispatch ("hl.dsp.focus({ monitor = '" + $target + "' })") out> (null-device)
+            } else {
+                log warning $"    could not find wl-mirror window for ($output)"
+            }
+        }
+    }
 
-      # Move window to target output and make it fullscreen
+    log info "Done. Press Enter to stop all mirrors..."
+    input
 
-      hyprctl dispatch focuswindow address:$WINDOW_ADDRESS
-      hyprctl dispatch tagwindow crsmntr_pinned # address:$WINDOW_ADDRESS
-      hyprctl dispatch focuswindow address:$WINDOW_ADDRESS
-      hyprctl dispatch movewindow mon:$OUTPUT # address:$WINDOW_ADDRESS
-      hyprctl dispatch focuswindow address:$WINDOW_ADDRESS
-      hyprctl dispatch fullscreen # address:$WINDOW_ADDRESS
-      hyprctl dispatch focusmonitor $TARGET_OUTPUT
-
-      echo "Successfully set up mirror on $OUTPUT (PID: $MIRROR_PID)"
-    else
-      echo "Warning: Could not find wl-mirror window for output $OUTPUT"
-    fi
-
-    ((COUNTER++))
-  fi
-done
-
-echo ""
-echo "Mirroring setup complete!"
-echo "Mirror processes running: ${MIRROR_PIDS[@]}"
-echo ""
-echo "Press Ctrl+C to stop all mirrors"
-
-# Function to cleanup on exit
-cleanup() {
-  echo ""
-  echo "Stopping all mirror processes..."
-  for PID in "${MIRROR_PIDS[@]}"; do
-    if kill -0 "$PID" 2>/dev/null; then
-      kill "$PID"
-      echo "Stopped process $PID"
-    fi
-  done
-  exit 0
+    log info "Stopping mirror processes..."
+    ^pkill wl-mirror
+    log info "Done."
 }
-
-# Set up signal handler for cleanup
-trap cleanup SIGINT SIGTERM
-
-# Wait for user interruption
-while true; do
-  sleep 1
-done
