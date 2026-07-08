@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+
+# Simple script to temporarily isolate a Wayland output
+# Usage: ./isolate-output.sh [output-name]
+
+set -e
+
+# Default to current active output if none provided
+if [ $# -eq 0 ]; then
+  TARGET_OUTPUT=$(hyprctl activeworkspace -j | jq -r '.monitor')
+elif [ $# -ne 1 ]; then
+  echo "Usage: $0 [output-name]"
+  echo "Defaults to current active monitor if not provided"
+  echo "Available outputs:"
+  hyprctl monitors | grep -E "^Monitor" | cut -d' ' -f2
+  exit 1
+else
+  TARGET_OUTPUT="$1"
+fi
+
+# Verify target output exists
+if ! hyprctl monitors -j | jq -r '.[].name' | grep -q "^$TARGET_OUTPUT$"; then
+  echo "Error: Output '$TARGET_OUTPUT' not found."
+  exit 1
+fi
+
+echo "Isolating output: $TARGET_OUTPUT"
+
+# Store workspace to monitor mapping
+declare -A ws_map
+while IFS=' ' read -r id mon; do
+  ws_map["$id"]="$mon"
+done < <(hyprctl workspaces -j | jq -r '.[] | "\(.id) \(.monitor)"')
+
+# Get all outputs and turn off DPMS for all except target
+hyprctl monitors -j | jq -r '.[].name' | while read output; do
+  if [ "$output" = "$TARGET_OUTPUT" ]; then
+    echo "Keeping $output enabled"
+  else
+    echo "Turning off $output"
+    # hyprctl dispatch dpms off "$output"
+    hyprctl keyword monitor "$output",disable
+  fi
+done
+
+echo ""
+echo "Output '$TARGET_OUTPUT' is now isolated."
+echo "Press Ctrl+C to restore all outputs..."
+
+# Restore function
+restore() {
+  echo -e "\nRestoring all outputs..."
+  # # Re-enable all monitors and DPMS
+  # hyprctl monitors -j | jq -r '.[].name' | while read output; do
+  #   hyprctl dispatch dpms on "$output"
+  # done
+  hyprctl reload
+  # Restore workspaces to original monitors
+  for id in "${!ws_map[@]}"; do
+    hyprctl dispatch moveworkspace "$id","${ws_map[$id]}"
+  done
+  exit 0
+}
+
+trap restore SIGINT SIGTERM
+
+while true; do
+  sleep 1
+done

@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+
+# Script to mirror a Wayland output to all other outputs using wl-mirror and Hyprland
+# Usage: ./mirror-output.sh <output_to_mirror>
+
+if [ $# -eq 0 ]; then
+  TARGET_OUTPUT=$(hyprctl activeworkspace -j | jq -r '.monitor')
+elif [ $# -ne 1 ]; then
+  echo "Usage: $0 [output_to_mirror]"
+  echo "Defaults to current active monitor if not provided"
+  echo "Available outputs:"
+  hyprctl monitors | grep -E "^Monitor" | cut -d' ' -f2
+  exit 1
+else
+  TARGET_OUTPUT="$1"
+fi
+
+# Get all outputs from Hyprland
+ALL_OUTPUTS=$(hyprctl monitors -j | jq -r '.[].name')
+
+if [ -z "$ALL_OUTPUTS" ]; then
+  echo "Error: Could not get outputs from Hyprland"
+  exit 1
+fi
+
+# Check if target output exists
+if ! echo "$ALL_OUTPUTS" | grep -q "^$TARGET_OUTPUT$"; then
+  echo "Error: Output '$TARGET_OUTPUT' not found. Available outputs:"
+  echo "$ALL_OUTPUTS"
+  exit 1
+fi
+
+echo "Mirroring output: $TARGET_OUTPUT"
+echo "Available outputs: $ALL_OUTPUTS"
+
+# Counter for window identification
+COUNTER=0
+
+# Create mirror windows for each output except the target
+for OUTPUT in $ALL_OUTPUTS; do
+  if [ "$OUTPUT" != "$TARGET_OUTPUT" ]; then
+    echo "Creating mirror on output: $OUTPUT"
+
+    # Start wl-mirror in background
+    hyprctl dispatch focusmonitor $OUTPUT
+    wl-mirror -s c "$TARGET_OUTPUT" &
+    MIRROR_PID=$!
+
+    # Store PID and output for later reference
+    MIRROR_PIDS[$COUNTER]=$MIRROR_PID
+    MIRROR_OUTPUTS[$COUNTER]=$OUTPUT
+
+    # Give wl-mirror a moment to create the window
+    sleep 0.2
+
+    # Get the window address (you might need to adjust this based on your window manager)
+    # This tries to find the most recently created wl-mirror window
+    WINDOW_ADDRESS=$(hyprctl clients -j | jq -r ".[] | select(.class == \"at.yrlf.wl_mirror\") | .address" | tail -n1)
+
+    if [ -n "$WINDOW_ADDRESS" ]; then
+      echo "Moving wl-mirror window $WINDOW_ADDRESS to output $OUTPUT"
+
+      # Move window to target output and make it fullscreen
+
+      hyprctl dispatch focuswindow address:$WINDOW_ADDRESS
+      hyprctl dispatch tagwindow crsmntr_pinned # address:$WINDOW_ADDRESS
+      hyprctl dispatch focuswindow address:$WINDOW_ADDRESS
+      hyprctl dispatch movewindow mon:$OUTPUT # address:$WINDOW_ADDRESS
+      hyprctl dispatch focuswindow address:$WINDOW_ADDRESS
+      hyprctl dispatch fullscreen # address:$WINDOW_ADDRESS
+      hyprctl dispatch focusmonitor $TARGET_OUTPUT
+
+      echo "Successfully set up mirror on $OUTPUT (PID: $MIRROR_PID)"
+    else
+      echo "Warning: Could not find wl-mirror window for output $OUTPUT"
+    fi
+
+    ((COUNTER++))
+  fi
+done
+
+echo ""
+echo "Mirroring setup complete!"
+echo "Mirror processes running: ${MIRROR_PIDS[@]}"
+echo ""
+echo "Press Ctrl+C to stop all mirrors"
+
+# Function to cleanup on exit
+cleanup() {
+  echo ""
+  echo "Stopping all mirror processes..."
+  for PID in "${MIRROR_PIDS[@]}"; do
+    if kill -0 "$PID" 2>/dev/null; then
+      kill "$PID"
+      echo "Stopped process $PID"
+    fi
+  done
+  exit 0
+}
+
+# Set up signal handler for cleanup
+trap cleanup SIGINT SIGTERM
+
+# Wait for user interruption
+while true; do
+  sleep 1
+done
