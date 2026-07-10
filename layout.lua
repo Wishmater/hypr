@@ -33,7 +33,7 @@ vars.setConfig({
 	},
 
 	master = {
-		-- # orientation is set with workspace rules on a per-monitor basis
+		-- -- orientation is set with workspace rules on a per-monitor basis
 		-- orientation = "top", -- placement of master window
 
 		-- mfact = 0.71875 -- size of the master window, trying to get a 1x2 slave panel (1920-540)/1920
@@ -46,8 +46,8 @@ vars.setConfig({
 		new_on_active = "before",
 
 		slave_count_for_center_master = 0,
-		-- # this is overall pretty buggy, better to implement with workspace rules
-		-- # it has a breaking bug where window dragging will be borked, try on new release
+		-- -- this is overall pretty buggy, better to implement with workspace rules
+		-- -- it has a breaking bug where window dragging will be borked, try on new release
 		-- orientation = "center",
 		-- center_master_fallback = "right",
 		-- slave_count_for_center_master = 6,
@@ -60,7 +60,8 @@ vars.setConfig({
 	scrolling = {
 		fullscreen_on_one_column = false,
 		-- column_width = 0.68359375,
-		column_width = 0.3140625, -- TODO: 3 we should use this for vertical monitors and the other for horizontal. Not possible to make the distinction right now.
+		-- TODO: 3 we should use this for vertical monitors and the other for horizontal. Not possible to make the distinction right now.
+		column_width = 0.3140625,
 		explicit_column_widths = "0.3140625, 0.5, 0.68359375, 1.0",
 		focus_fit_method = 0, -- center
 		-- follow_min_visible = 0,
