@@ -74,7 +74,7 @@ hl.bind("SUPER + SHIFT + J", hl.dsp.window.move({ direction = "d" }))
 
 -- RESIZE WINDOWS
 -- Hack to enable animations for manual resizing with keyboard but not with mouse
--- TODO: 1 animate_manual_resizes doesn't work in tiled (at least in master), it does work floating
+-- TODO: 2 animate_manual_resizes doesn't work in tiled (at least in master layout), it does work floating, check next version if fixed
 local function resizeAnim(xDelta, yDelta)
 	local revert = vars.tempConfig({ misc = { animate_manual_resizes = true } })
 	-- hl.exec_scheduled_prop_refresh_immediately()
