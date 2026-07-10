@@ -39,7 +39,7 @@ vars.setConfig({
 		keep_unmodified_copy = 2, -- default 2, only hdr
 
 		-- HDR options
-		-- cm_fs_passthrough = 1 -- Passthrough color settings for fullscreen apps when possible. 0 - off, 1 - always, 2 - hdr only
+		cm_auto_hdr = 0, -- Auto-switch to HDR in fullscreen when needed. Default 1. 0 - off, 1 - switch to cm, hdr, 2 - switch to cm, hdredid.
 
 		-- this causes severe visual glitches (parts of the screen going black), especially on fullscreened xwayland apps with popups
 		-- direct_scanout = 1, -- apparently can improve latency for fullscreen windows, but sometimes cause glitches, so if it happens, disable it
