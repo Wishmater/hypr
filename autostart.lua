@@ -8,9 +8,13 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("ghostty --initial-window=false --gtk-single-instance=true --quit-after-last-window-closed=false")
 
 	hl.exec_cmd(vars.browser)
-	-- hl.timer(function()
-	--     hl.dispatch(hl.dsp.window.move({ window = , workspace = 1, follow = false }))
-	-- end, { timeout = 2000, type = "oneshot" })
+	hl.timer(function()
+		hl.dispatch(hl.dsp.window.move({ window = "title:^[YouTube] ", workspace = 3, follow = false }))
+		hl.dispatch(hl.dsp.window.move({ window = "title:^[Anime] ", workspace = 5, follow = false }))
+		hl.dispatch(hl.dsp.window.move({ window = "title:^[WhatsApp] ", workspace = "special:1", follow = false }))
+		hl.dispatch(hl.dsp.window.move({ window = "title:^[Twitter] ", workspace = "special:2", follow = false }))
+		hl.dispatch(hl.dsp.window.tag({ window = "title:^[YouTube] ", tag = "+crsmntr_pinned" }))
+	end, { timeout = 2000, type = "oneshot" })
 
 	hl.exec_cmd("obsidian")
 	hl.timer(function()
@@ -25,6 +29,3 @@ hl.on("hyprland.start", function()
 		)
 	end, { timeout = 2000, type = "oneshot" })
 end)
-
--- TODO: 2 move specific firefox windows: youtube to 3rd monitor, anime to 2nd monitor 2nd workspace, twitter to 2nd special
--- TODO: 2 pin some windows (obsidian + 3rd monitor firefox)
