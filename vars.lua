@@ -30,7 +30,33 @@ M.resizeAmount = 60
 
 -------------------------------------------------------------------------------
 -- Utility functions / definitions
--------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+-- TODO: 3 (0.55.4): Remove moveByTitle and tagByTitle these when Hyprland fixes title:string-based window
+-- matching in the Lua dispatch API (class:, address:, pid: all work, but
+-- title: and initialTitle: are silently ignored).  Test with:
+--   hyprctl dispatch 'hl.dsp.window.move({ window = "title:Obsidian", workspace = 3, follow = false })'
+-- If a window with "Obsidian" in its title actually moves, the bug is fixed.
+
+--- @param titlePattern string Lua pattern
+--- @param workspace    string|integer
+M.moveByTitle = function(titlePattern, workspace)
+	for _, w in ipairs(hl.get_windows()) do
+		if w.title:match(titlePattern) then
+			hl.dispatch(hl.dsp.window.move({ window = w, workspace = workspace, follow = false }))
+		end
+	end
+end
+
+--- @param titlePattern string Lua pattern
+--- @param tag          string
+M.tagByTitle = function(titlePattern, tag)
+	for _, w in ipairs(hl.get_windows()) do
+		if w.title:match(titlePattern) then
+			hl.dispatch(hl.dsp.window.tag({ window = w, tag = tag }))
+		end
+	end
+end
 
 ---@class MonitorConfig
 ---@field id string
