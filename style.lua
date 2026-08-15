@@ -20,8 +20,8 @@ vars.setConfig({
 	},
 
 	decoration = {
-		rounding = 1, -- 20
-		rounding_power = 256, -- 10
+		rounding = 20,
+		rounding_power = 10,
 
 		active_opacity = 1.0,
 		fullscreen_opacity = 1.0,

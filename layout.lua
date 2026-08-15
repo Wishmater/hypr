@@ -92,7 +92,7 @@ vars.setConfig({
 
 			height = 22,
 			gradients = true, -- indicator is set as background of the full height of groupbar
-			gradient_rounding = 28,
+			gradient_rounding = 20,
 			gradient_rounding_power = 4,
 			gradient_round_only_edges = false,
 			gaps_in = 4,
