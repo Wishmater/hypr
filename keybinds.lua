@@ -219,8 +219,8 @@ hl.bind("SUPER + XF86AudioPlay", hl.dsp.exec_cmd("waywingctl VolumeService/cycle
 hl.bind("SUPER + SHIFT + XF86AudioPlay", hl.dsp.exec_cmd("waywingctl VolumeService/cycleInput"), { locked = true })
 
 -- Zooming
-hl.bind("SUPER + mouse_down", hl.dsp.focus({ direction = "u" }))
-hl.bind("SUPER + mouse_up", hl.dsp.focus({ direction = "d" }))
+hl.bind("SUPER + mouse_down", hl.dsp.focus({ direction = "d" }))
+hl.bind("SUPER + mouse_up", hl.dsp.focus({ direction = "u" }))
 hl.bind("SUPER + SHIFT + mouse_down", hl.dsp.exec_cmd("hyprzoom in"), { repeating = true })
 hl.bind("SUPER + SHIFT + mouse_up", hl.dsp.exec_cmd("hyprzoom out"), { repeating = true })
 hl.bind("SUPER + SHIFT + CTRL + mouse_up", hl.dsp.exec_cmd("hyprzoom reset"))
