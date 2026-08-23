@@ -74,13 +74,21 @@ vars.setConfig({
 		merge_groups_on_drag = false,
 		merge_groups_on_groupbar = true,
 
-		-- TODO: 3 maybe change colors for groups ??
-		col = {
-			border_active = vars.baseConfig.general.col.active_border,
-			border_inactive = vars.baseConfig.general.col.inactive_border,
-			border_locked_active = vars.baseConfig.general.col.active_border,
-			border_locked_inactive = vars.baseConfig.general.col.inactive_border,
-		},
+		-- The group border colors mirror general.col, which is set by style. The
+		-- minimal config doesn't define general.col (it disables borders), so only
+		-- inherit these colors when they exist, otherwise leave group.col unset.
+		col = (function()
+			if vars.baseConfig.general.col then
+				-- TODO: 3 maybe change colors for groups ??
+				return {
+					border_active = vars.baseConfig.general.col.active_border,
+					border_inactive = vars.baseConfig.general.col.inactive_border,
+					border_locked_active = vars.baseConfig.general.col.active_border,
+					border_locked_inactive = vars.baseConfig.general.col.inactive_border,
+				}
+			end
+			return nil
+		end)(),
 
 		groupbar = {
 			-- enabled = false,
