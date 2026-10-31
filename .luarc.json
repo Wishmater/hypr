@@ -12,6 +12,8 @@
     "hl"
   ],
   "diagnostics.disable": [
-      "lowercase-global"
-  ]
+    "lowercase-global",
+    "different-requires"
+  ],
+  "diagnostics.libraryFiles": "Disable"
 }

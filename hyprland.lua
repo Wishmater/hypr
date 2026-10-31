@@ -1,6 +1,7 @@
 -- https://wiki.hyprland.org/Configuring/
 
 vars = require("vars")
+actions = require("actions")
 
 require("env")
 require("monitors")
