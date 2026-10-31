@@ -3,6 +3,9 @@
   "workspace.library": [
     "hl.meta.lua"
   ],
+  "workspace.ignoreDir": [
+    "hl.meta.lua"
+  ],
   "runtime.version": "Lua 5.5",
   "runtime.path": [
     "?.lua",
@@ -15,5 +18,6 @@
     "lowercase-global",
     "different-requires"
   ],
-  "diagnostics.libraryFiles": "Disable"
+  "diagnostics.libraryFiles": "Disable",
+  "diagnostics.ignoredFiles": "Disable"
 }
