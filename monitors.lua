@@ -1,33 +1,34 @@
 hl.monitor({
 	output = vars.monitors[1].id,
-	mode = "1920x1080@180",
+	mode = "1920x1080@60",
 	position = "0x0",
 	scale = 1,
-	bitdepth = 10,
-	cm = "hdr",
-	supports_wide_color = true,
-	supports_hdr = true,
-	sdrbrightness = 1.50,
-	sdrsaturation = 1.05,
-	sdr_min_luminance = 0.005,
-	sdr_max_luminance = 75,
+	-- bitdepth = 10,
+	-- cm = "hdr",
+	-- supports_wide_color = true,
+	-- supports_hdr = true,
+	-- sdrbrightness = 1.50,
+	-- sdrsaturation = 1.05,
+	-- sdr_min_luminance = 0.005,
+	-- sdr_max_luminance = 75,
 })
 
 hl.monitor({
 	output = vars.monitors[2].id,
 	mode = "1920x1080@60",
-	position = "-1080x-330", -- -1080x-420 is centered, but it's a bit different to match physical monitor
+	-- position = "-1080x-330", -- -1080x-420 is centered, but it's a bit different to match physical monitor
+	position = "-1080x-210", -- -1080x-420 is centered, but it's a bit different to match physical monitor
 	scale = 1,
 	transform = 1,
 	reserved = { bottom = 165 }, -- phisically center windows on the monitor, which is not aligned vertically with the main monitor
 })
 
-hl.monitor({
-	output = vars.monitors[3].id,
-	mode = "1920x1080@60",
-	position = "1920x0",
-	scale = 1,
-})
+-- hl.monitor({
+-- 	output = vars.monitors[3].id,
+-- 	mode = "1920x1080@60",
+-- 	position = "1920x0",
+-- 	scale = 1,
+-- })
 
 vars.setConfig({
 	misc = {
