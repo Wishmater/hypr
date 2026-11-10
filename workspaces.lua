@@ -13,17 +13,26 @@ end
 
 -- assign gaps per monitor orientation
 for _, monitor in ipairs(vars.monitors) do
+	local gapsOutScale = monitor.gapsOutScale or 1
+	-- at least 2x on normal monitors, but only partially grow with the monitor's scale
+	local gapsOutScaleSpecial = math.max(2, 1.33 * gapsOutScale)
+
 	hl.workspace_rule({
 		workspace = "s[false]m[" .. monitor.id .. "]",
 		gaps_in = vars.aspectRatioGaps(vars.baseConfig.general.gaps_in, 16 / 9, monitor.orientation),
-		gaps_out = vars.aspectRatioGaps(vars.baseConfig.general.gaps_out, 16 / 9, monitor.orientation),
+		gaps_out = vars.aspectRatioGaps(vars.baseConfig.general.gaps_out, 16 / 9, monitor.orientation, gapsOutScale),
 	})
 
 	-- make special workspaces have more gaps than normal workspaces
 	hl.workspace_rule({
 		workspace = "s[true]m[" .. monitor.id .. "]",
 		gaps_in = vars.aspectRatioGaps(vars.baseConfig.general.gaps_in, 16 / 9, monitor.orientation, 2),
-		gaps_out = vars.aspectRatioGaps(vars.baseConfig.general.gaps_out, 16 / 9, monitor.orientation, 2),
+		gaps_out = vars.aspectRatioGaps(
+			vars.baseConfig.general.gaps_out,
+			16 / 9,
+			monitor.orientation,
+			gapsOutScaleSpecial
+		),
 	})
 
 	-- layout/orientation-specific options

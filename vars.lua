@@ -18,6 +18,7 @@ M.monitors = {
 		layout = "master",
 		orientation = "horizontal",
 		direction = "right",
+		gapsOutScale = 5, -- bigger monitor, so outer gaps need to be bigger to look the same
 	},
 	{ id = "HDMI-A-1", layout = "scrolling", orientation = "vertical", direction = "down" },
 	{
@@ -70,6 +71,7 @@ end
 ---@field direction 'left'|'right'|'up'|'down'
 ---@field centerSingleWindow boolean?
 ---@field centerTooManyWindows boolean?
+---@field gapsOutScale number? -- multiplies gaps_out, defaults to 1
 
 --- @param baseGap integer|HL.CssGap
 --- @param aspectRatio number
