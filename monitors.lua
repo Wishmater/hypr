@@ -1,34 +1,39 @@
 hl.monitor({
 	output = vars.monitors[1].id,
-	mode = "1920x1080@60",
+	mode = "2560x1440@180",
 	position = "0x0",
-	scale = 1,
-	-- bitdepth = 10,
-	-- cm = "hdr",
-	-- supports_wide_color = true,
-	-- supports_hdr = true,
-	-- sdrbrightness = 1.50,
-	-- sdrsaturation = 1.05,
-	-- sdr_min_luminance = 0.005,
-	-- sdr_max_luminance = 75,
+	scale = 1.07, -- logical size becomes 2400x1350
+	bitdepth = 10,
+	cm = "hdr",
+	supports_wide_color = true,
+	supports_hdr = true,
+	sdrbrightness = 1.00, -- 1.0 makes it match HDR-native apps
+	sdrsaturation = 1.00, -- 1.0 makes it match HDR-native apps
+	sdr_min_luminance = 0.005, -- 0.005 makes blacks true blacks, good for OLED, according to hyprland config
+	sdr_max_luminance = 203, -- 203 makes it match HDR-native apps, lower brightness in-monitor if too bright
+
+	-- these are monitor-specific, advertised by the monitor, but according to the clanker
+	-- these values are closer to reality than manufacturer's exaggerated values
+	min_luminance = 0.0005,
+	max_luminance = 400,
+	max_avg_luminance = 200,
 })
 
 hl.monitor({
 	output = vars.monitors[2].id,
 	mode = "1920x1080@60",
-	-- position = "-1080x-330", -- -1080x-420 is centered, but it's a bit different to match physical monitor
-	position = "-1080x-210", -- -1080x-420 is centered, but it's a bit different to match physical monitor
+	position = "-1080x-190", -- -1080x-420 is centered, but it's a bit different to match physical monitor
 	scale = 1,
 	transform = 1,
 	reserved = { bottom = 165 }, -- phisically center windows on the monitor, which is not aligned vertically with the main monitor
 })
 
--- hl.monitor({
--- 	output = vars.monitors[3].id,
--- 	mode = "1920x1080@60",
--- 	position = "1920x0",
--- 	scale = 1,
--- })
+hl.monitor({
+	output = vars.monitors[3].id,
+	mode = "1920x1080@60",
+	position = "2400x40",
+	scale = 1,
+})
 
 vars.setConfig({
 	misc = {
@@ -49,5 +54,9 @@ vars.setConfig({
 
 	quirks = {
 		prefer_hdr = 1,
+	},
+
+	xwayland = {
+		force_zero_scaling = true, -- makes xwayland apps (mostly games) ignore scale on monitor and run always at native resolution
 	},
 })

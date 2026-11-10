@@ -14,21 +14,20 @@ M.workspaceCount = 4
 ---@type MonitorConfig[]
 M.monitors = {
 	{
-		id = "DP-1",
-		-- id = "DP-3",
+		id = "DP-3",
 		layout = "master",
 		orientation = "horizontal",
 		direction = "right",
 	},
 	{ id = "HDMI-A-1", layout = "scrolling", orientation = "vertical", direction = "down" },
-	-- {
-	-- 	id = "DP-1",
-	-- 	layout = "master",
-	-- 	orientation = "horizontal",
-	-- 	direction = "left",
-	-- 	centerSingleWindow = false,
-	-- 	centerTooManyWindows = false,
-	-- },
+	{
+		id = "DP-1",
+		layout = "master",
+		orientation = "horizontal",
+		direction = "left",
+		centerSingleWindow = false,
+		centerTooManyWindows = false,
+	},
 }
 
 -- Resize amount for keyboard resizing
