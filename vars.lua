@@ -73,12 +73,15 @@ end
 ---@field centerTooManyWindows boolean?
 ---@field gapsOutScale number? -- multiplies gaps_out, defaults to 1
 
+M.goldenRatio = (1 + math.sqrt(5)) / 2
+
 --- @param baseGap integer|HL.CssGap
 --- @param aspectRatio number
 --- @param orientation? 'horizontal'|'vertical'
 --- @param scale? number
+--- @param verticalAddedRatio? number -- bottom:top ratio for the added (scale-1) top/bottom gap, default 1
 --- @return HL.CssGap
-M.aspectRatioGaps = function(baseGap, aspectRatio, orientation, scale)
+M.aspectRatioGaps = function(baseGap, aspectRatio, orientation, scale, verticalAddedRatio)
 	orientation = orientation or "horizontal"
 	scale = scale or 1
 	local function wideVal(v)
@@ -87,20 +90,42 @@ M.aspectRatioGaps = function(baseGap, aspectRatio, orientation, scale)
 	local function narrowVal(v)
 		return v and math.floor(v * scale + 0.5) or nil
 	end
+	local gap
 	if type(baseGap) == "number" then
-		return {
+		gap = {
 			left = orientation == "horizontal" and wideVal(baseGap) or narrowVal(baseGap),
 			right = orientation == "horizontal" and wideVal(baseGap) or narrowVal(baseGap),
 			top = orientation == "horizontal" and narrowVal(baseGap) or wideVal(baseGap),
 			bottom = orientation == "horizontal" and narrowVal(baseGap) or wideVal(baseGap),
 		}
+	else
+		gap = {
+			left = orientation == "horizontal" and wideVal(baseGap.left) or narrowVal(baseGap.left),
+			right = orientation == "horizontal" and wideVal(baseGap.right) or narrowVal(baseGap.right),
+			top = orientation == "horizontal" and narrowVal(baseGap.top) or wideVal(baseGap.top),
+			bottom = orientation == "horizontal" and narrowVal(baseGap.bottom) or wideVal(baseGap.bottom),
+		}
 	end
-	return {
-		left = orientation == "horizontal" and wideVal(baseGap.left) or narrowVal(baseGap.left),
-		right = orientation == "horizontal" and wideVal(baseGap.right) or narrowVal(baseGap.right),
-		top = orientation == "horizontal" and narrowVal(baseGap.top) or wideVal(baseGap.top),
-		bottom = orientation == "horizontal" and narrowVal(baseGap.bottom) or wideVal(baseGap.bottom),
-	}
+
+	-- Redistribute only the multiplier-added top/bottom gap by the given ratio,
+	-- keeping the base gap and the vertical sum unchanged.
+	if verticalAddedRatio and verticalAddedRatio ~= 1 and scale ~= 1 and gap.top and gap.bottom then
+		local topBase = type(baseGap) == "number" and baseGap or baseGap.top
+		local bottomBase = type(baseGap) == "number" and baseGap or baseGap.bottom
+		if topBase and bottomBase then
+			local wide = orientation == "vertical"
+			--- @param v number
+			local function baseVal(v)
+				return wide and v * aspectRatio or v
+			end
+			local addedTotal = (baseVal(topBase) + baseVal(bottomBase)) * (scale - 1)
+			local oldSum = gap.top + gap.bottom
+			local newTop = math.floor(baseVal(topBase) + addedTotal / (1 + verticalAddedRatio) + 0.5)
+			gap.top = newTop
+			gap.bottom = oldSum - newTop
+		end
+	end
+	return gap
 end
 
 --- @param direction 'left'|'right'|'up'|'down'

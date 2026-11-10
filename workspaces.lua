@@ -16,11 +16,19 @@ for _, monitor in ipairs(vars.monitors) do
 	local gapsOutScale = monitor.gapsOutScale or 1
 	-- at least 2x on normal monitors, but only partially grow with the monitor's scale
 	local gapsOutScaleSpecial = math.max(2, 1.33 * gapsOutScale)
+	-- only monitors that add gaps beyond the base get the asymmetric top/bottom split
+	local verticalAddedRatio = gapsOutScale > 1 and vars.goldenRatio or nil
 
 	hl.workspace_rule({
 		workspace = "s[false]m[" .. monitor.id .. "]",
 		gaps_in = vars.aspectRatioGaps(vars.baseConfig.general.gaps_in, 16 / 9, monitor.orientation),
-		gaps_out = vars.aspectRatioGaps(vars.baseConfig.general.gaps_out, 16 / 9, monitor.orientation, gapsOutScale),
+		gaps_out = vars.aspectRatioGaps(
+			vars.baseConfig.general.gaps_out,
+			16 / 9,
+			monitor.orientation,
+			gapsOutScale,
+			verticalAddedRatio
+		),
 	})
 
 	-- make special workspaces have more gaps than normal workspaces
@@ -31,7 +39,8 @@ for _, monitor in ipairs(vars.monitors) do
 			vars.baseConfig.general.gaps_out,
 			16 / 9,
 			monitor.orientation,
-			gapsOutScaleSpecial
+			gapsOutScaleSpecial,
+			verticalAddedRatio
 		),
 	})
 
