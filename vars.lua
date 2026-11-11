@@ -18,7 +18,7 @@ M.monitors = {
 		layout = "master",
 		orientation = "horizontal",
 		direction = "right",
-		gapsOutScale = 5, -- bigger monitor, so outer gaps need to be bigger to look the same
+		gapsOutScale = 7.5, -- bigger monitor, so outer gaps need to be bigger
 	},
 	{ id = "HDMI-A-1", layout = "scrolling", orientation = "vertical", direction = "down" },
 	{

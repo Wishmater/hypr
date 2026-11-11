@@ -25,7 +25,7 @@ hl.monitor({
 	position = "-1080x-190", -- -1080x-420 is centered, but it's a bit different to match physical monitor
 	scale = 1,
 	transform = 1,
-	reserved = { bottom = 165 }, -- phisically center windows on the monitor, which is not aligned vertically with the main monitor
+	reserved = { bottom = 120 }, -- phisically center windows on the monitor, which is not aligned vertically with the main monitor
 })
 
 hl.monitor({
