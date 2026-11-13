@@ -217,6 +217,20 @@ hl.bind("XF86AudioMute", hl.dsp.exec_cmd("waywingctl VolumeService/muteOutput"),
 hl.bind("SHIFT + XF86AudioMute", hl.dsp.exec_cmd("waywingctl VolumeService/muteInput"), { locked = true })
 -- not used on current keyboard
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true })
+
+-- PCsensor footswitch: pedals send a/b/c from pcsensor-footswitch-keyboard
+-- A: toggle mic mute
+-- B: push-to-talk (unmute while held, mute on release)
+-- C: unbound
+local footswitch = { device = { list = { "pcsensor-footswitch-keyboard" } } }
+hl.bind("A", hl.dsp.exec_cmd("waywingctl VolumeService/muteInput"), footswitch)
+hl.bind("B", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 0"), footswitch)
+hl.bind(
+	"B",
+	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 1"),
+	{ device = { list = { "pcsensor-footswitch-keyboard" } }, release = true }
+)
+
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
 -- fallbacks not using waywing
