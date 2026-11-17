@@ -29,6 +29,6 @@ vars.setConfig({
 
 	misc = {
 		middle_click_paste = false,
-		key_press_enables_dpms = true,
+		key_press_enables_dpms = false, -- waking from DPMS is bound explicitly (SUPER + F12)
 	},
 })

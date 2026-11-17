@@ -170,6 +170,33 @@ M.closeSpecialWorkspace = function(maxCount)
 	hl.dispatch(hl.dsp.workspace.toggle_special(specialName(ws)))
 end
 
+-- Monitor power -------------------------------------------------------------
+
+--- Turns the focused monitor off for real: the output is disabled (panel
+--- sleeps), the monitor leaves the layout, its workspaces move to another
+--- monitor and focus follows them. Use M.enableAllMonitors() to bring it back.
+M.disableFocusedMonitor = function()
+	if #hl.get_monitors() <= 1 then
+		hl.notification.create({ text = "Not disabling the last monitor", timeout = 3000 })
+		return
+	end
+
+	local monitor = hl.get_active_monitor()
+	if not monitor then
+		return
+	end
+
+	hl.monitor({ output = monitor.name, disabled = true })
+end
+
+--- Re-enables every monitor in vars.monitors. Rules for already-enabled
+--- monitors come out identical (full match), so this causes no modeset.
+M.enableAllMonitors = function()
+	for _, monitor in ipairs(vars.monitors) do
+		hl.monitor({ output = monitor.id, disabled = false })
+	end
+end
+
 -- Cursor zoom ---------------------------------------------------------------
 
 local MIN_ZOOM = 1.0

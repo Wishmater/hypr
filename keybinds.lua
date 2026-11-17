@@ -124,6 +124,16 @@ hl.bind("SUPER + SHIFT + CTRL + ALT + E", hl.dsp.exec_cmd("hyprshot -m region --
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("record_screen output"))
 hl.bind("SUPER + SHIFT + CTRL + R", hl.dsp.exec_cmd("record_screen region"))
 
+-- MONITOR POWER
+hl.bind("SUPER + SHIFT + D", function()
+	actions.disableFocusedMonitor()
+end, { description = "Disable focused monitor" })
+hl.bind("SUPER + SHIFT + CTRL + D", function()
+	actions.enableAllMonitors()
+end, { description = "Re-enable all monitors" })
+hl.bind("SUPER + SHIFT + F12", hl.dsp.dpms({ action = "off" }), { locked = true, description = "Turn off all monitors" })
+hl.bind("SUPER + F12", hl.dsp.dpms({ action = "on" }), { locked = true, description = "Wake all monitors" })
+
 -- NOTIFICATIONS
 hl.bind("SUPER + N", hl.dsp.exec_cmd("waywingctl  Bar/togglePopover?feather=End/NotificationManager"))
 hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("waywingctl NotificationsService/toggleSilenced"))
