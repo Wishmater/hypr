@@ -131,7 +131,11 @@ end, { description = "Disable focused monitor" })
 hl.bind("SUPER + SHIFT + CTRL + D", function()
 	actions.enableAllMonitors()
 end, { description = "Re-enable all monitors" })
-hl.bind("SUPER + SHIFT + F12", hl.dsp.dpms({ action = "off" }), { locked = true, description = "Turn off all monitors" })
+hl.bind(
+	"SUPER + SHIFT + F12",
+	hl.dsp.dpms({ action = "off" }),
+	{ locked = true, description = "Turn off all monitors" }
+)
 hl.bind("SUPER + F12", hl.dsp.dpms({ action = "on" }), { locked = true, description = "Wake all monitors" })
 
 -- NOTIFICATIONS
@@ -203,28 +207,38 @@ hl.bind("SUPER + mouse:273", hl.dsp.window.resize(), { mouse = true, description
 -- Laptop multimedia keys for volume and LCD brightness
 -- CHANGE: bindel → { locked = true, repeating = true }
 --         bindl  → { locked = true }
+
+-- waywing first; wpctl is the fallback when waywing is unreachable
 hl.bind(
 	"XF86AudioRaiseVolume",
-	hl.dsp.exec_cmd("waywingctl VolumeService/increaseOutputVolume"),
+	hl.dsp.exec_cmd("waywingctl VolumeService/increaseOutputVolume || wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"),
 	{ locked = true, repeating = true }
 )
 hl.bind(
 	"XF86AudioLowerVolume",
-	hl.dsp.exec_cmd("waywingctl VolumeService/decreaseOutputVolume"),
+	hl.dsp.exec_cmd("waywingctl VolumeService/decreaseOutputVolume || wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),
 	{ locked = true, repeating = true }
 )
 hl.bind(
 	"SHIFT + XF86AudioRaiseVolume",
-	hl.dsp.exec_cmd("waywingctl VolumeService/increaseInputVolume"),
+	hl.dsp.exec_cmd("waywingctl VolumeService/increaseInputVolume || wpctl set-volume -l 1 @DEFAULT_AUDIO_SOURCE@ 5%+"),
 	{ locked = true, repeating = true }
 )
 hl.bind(
 	"SHIFT + XF86AudioLowerVolume",
-	hl.dsp.exec_cmd("waywingctl VolumeService/decreaseInputVolume"),
+	hl.dsp.exec_cmd("waywingctl VolumeService/decreaseInputVolume || wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%-"),
 	{ locked = true, repeating = true }
 )
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd("waywingctl VolumeService/muteOutput"), { locked = true })
-hl.bind("SHIFT + XF86AudioMute", hl.dsp.exec_cmd("waywingctl VolumeService/muteInput"), { locked = true })
+hl.bind(
+	"XF86AudioMute",
+	hl.dsp.exec_cmd("waywingctl VolumeService/muteOutput || wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),
+	{ locked = true }
+)
+hl.bind(
+	"SHIFT + XF86AudioMute",
+	hl.dsp.exec_cmd("waywingctl VolumeService/muteInput || wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
+	{ locked = true }
+)
 -- not used on current keyboard
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true })
 
@@ -233,7 +247,11 @@ hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURC
 -- B: push-to-talk (unmute while held, mute on release)
 -- C: unbound
 local footswitch = { device = { list = { "pcsensor-footswitch-keyboard" } } }
-hl.bind("A", hl.dsp.exec_cmd("waywingctl VolumeService/muteInput"), footswitch)
+hl.bind(
+	"A",
+	hl.dsp.exec_cmd("waywingctl VolumeService/muteInput || wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
+	footswitch
+)
 hl.bind("B", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 0"), footswitch)
 hl.bind(
 	"B",
