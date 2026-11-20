@@ -230,17 +230,26 @@ hl.bind(
 	{ locked = true, repeating = true }
 )
 hl.bind(
-	"XF86AudioMute",
-	hl.dsp.exec_cmd("waywingctl VolumeService/muteOutput || wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),
-	{ locked = true }
-)
-hl.bind(
 	"SHIFT + XF86AudioMute",
 	hl.dsp.exec_cmd("waywingctl VolumeService/muteInput || wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
 	{ locked = true }
 )
+
+-- only on 75% keyboard (no media play/pause button)
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
+hl.bind("SUPER + XF86AudioMute", hl.dsp.exec_cmd("waywingctl VolumeService/cycleOutput"), { locked = true })
+
 -- not used on current keyboard
-hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true })
+-- hl.bind(
+-- 	"XF86AudioMute",
+-- 	hl.dsp.exec_cmd("waywingctl VolumeService/muteOutput || wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),
+-- 	{ locked = true }
+-- )
+-- hl.bind(
+-- 	"XF86AudioMicMute",
+-- 	hl.dsp.exec_cmd("waywingctl VolumeService/muteInput || wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
+-- 	{ locked = true }
+-- )
 
 -- PCsensor footswitch: pedals send a/b/c from pcsensor-footswitch-keyboard
 -- A: toggle mic mute
